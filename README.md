@@ -1,5 +1,5 @@
 # Boerenbridge
-This repository contains the code for my PWS on Boerenbridge.
+This repository contains the code for my profielwerkstuk on Boerenbridge.
 
 The file with the main algorithm is MCCFR.py.
 
