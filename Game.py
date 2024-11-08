@@ -40,7 +40,7 @@ class Game:
     @staticmethod
     def translate_suits(game_state):
         """Function which translates all the suits in a game state, based on the suit dict."""
-        suit_dict = game_state[5][game_state[0]]
+        suit_dict = game_state[4][game_state[0]]
         hand = game_state[1][game_state[0]]
         hist = game_state[2]
         new_hand = []
@@ -108,16 +108,15 @@ class Game:
         return (next_active_player, next_hands, history, terminal, game_state[4])
     
     def get_payoff(self, game_state):
-        """Function to determine the payoff of a game."""
+        """Function to determine the payoff of a game for a given player."""
         player = game_state[0]
         opponent = (player + 1) % 2
 
         if self.bets[player] == self.wins[player] & self.bets[opponent] == self.wins[opponent]:
             return 2*(self.wins[player] - self.wins[opponent])
         elif self.bets[player] == self.wins[player]:
-            return 10 + 2*(game_state[5][player] + abs(game_state[4][opponent] - game_state[5][opponent]))
+            return 10 + 2*(self.wins[player] + abs(self.bets[opponent] - self.wins[opponent]))
         elif self.bets[opponent] == self.wins[opponent]:
-            return 
+            return -10 - 2*(self.wins[opponent] + abs(self.bets[player] - self.wins[player]))
         else:
             return 2*(abs(self.bets[opponent] - self.wins[opponent]) - abs(self.bets[player] - self.wins[player]))
-

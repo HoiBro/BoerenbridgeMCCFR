@@ -175,7 +175,7 @@ class MCCFR:
 
         # Base case
         if game_state[3]:
-            return game_state[4]
+            return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
         payoff = -1
