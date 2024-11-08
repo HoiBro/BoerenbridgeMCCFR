@@ -100,9 +100,14 @@ class MCCFR:
     def external_cfr(self, game_state, reach_probs, update_player):
         """Recursive function for external sampled MCCFR."""
 
+        player = game_state[0]
+        opponent = (player + 1) % 2
+
         # Base case
         if game_state[3]:
-            return game_state[4]
+            if game_state[4][player] == game_state[5][player]:
+                return 10 + 2*game_state[5][player] + 2*abs(game_state[4][opponent] - game_state[5][opponent])
+            return 2*(abs(game_state[4][opponent] - game_state[5][opponent]) - abs(game_state[4][player] - game_state[5][player]))
 
         possible_actions = self.game.get_possible_actions(game_state)
         counterfactual_values = np.zeros(len(possible_actions))
@@ -116,8 +121,6 @@ class MCCFR:
             node_value = payoff * self.external_cfr(next_game_state, reach_probs, update_player)
 
         else:
-            player = game_state[0]
-            opponent = (player + 1) % 2
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
 

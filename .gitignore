@@ -160,3 +160,16 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+/Toepen.ipynb
+/Toepen-Abstraction.ipynb
+/Toepen-extensive-tree.ipynb
+/Toepen-mccfr-evaluate.ipynb
+/Toepen-Plot-Card-Isomorphism.ipynb
+/toepen-selfplaying.ipynb
+/Toepen_test_1.ipynb
+/Untitled.ipynb
+/LISA/
+/Plots/
+/.ipynb_checkpoints/
+/wandb/

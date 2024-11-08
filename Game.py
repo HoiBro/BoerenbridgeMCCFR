@@ -57,29 +57,28 @@ class Game:
     def sample_new_game(self, hands=None):
         """Function to sample an initial game state with an empty history. Optionality to provide hands instead of
         uniformly sampling a hand. Game state has form:
-        (active_player, hands, history, terminal, ante, suit_dicts, betting) where,
+        (active_player, hands, history, terminal, bets, wins, suit_dicts) where,
         active_player = 0 or 1 for player 0 or 1.
         hands = a list of lists, one for each player, containing cards which are tuples of the form: (suit, rank)
         history = tuple containing all actions in order
         terminal = boolean indicating whether the state is terminal
-        ante = integer representing the ante of the game
-        suit_dicts = list of suit_dicts, one for each player
-        betting= integer, representing the betting type"""
+        bets = list containing the bets each player provided at the start of the game
+        wins = list containing the amount of rounds each player has won
+        suit_dicts = list of suit_dicts, one for each player"""
         if hands:
             hands = [sorted(hands[0]), sorted(hands[1])]
             suit_dicts = [self.suit_abstraction_dict(hands[0]), self.suit_abstraction_dict(hands[1])]
-            return (0, hands, (), False, 1, suit_dicts, 2)
+            return (0, hands, (), False, [0, 0], [0, 0], suit_dicts)
         else:
             two_hands = random.sample(self.deck.deck2, 2 * self.handsize)
             hands = [sorted(two_hands[self.handsize:]), sorted(two_hands[:self.handsize])]
             suit_dicts = [self.suit_abstraction_dict(hands[0]), self.suit_abstraction_dict(hands[1])]
-            return (0, hands, (), False, 1, suit_dicts, 2)
+            return (0, hands, (), False, [0, 0], [0, 0], suit_dicts)
 
     def get_possible_actions(self, game_state):
         """Function which uses a game state to determine the possible actions as a list from this game state."""
         actions = sorted(game_state[1][game_state[0]])
 
-        # Logic for a game without betting.
         if len(game_state[2]) % 2 == 0:
             return actions
         else:
@@ -93,8 +92,6 @@ class Game:
     def get_next_game_state(self, game_state, action):
         """Function which returns a new game state, based on the previous game state and the action taken."""
         terminal = False
-        ante = game_state[4]
-        bet_id = game_state[6]
 
         # Prev_index, indicates where the previous card can be found in the history for the reacting player.
         round_size = 2
@@ -105,9 +102,6 @@ class Game:
 
         if action == 'Call':
             ante += 1
-
-        if action == 'Bet':
-            bet_id = game_state[0]
 
         next_active_player = (game_state[0] + 1) % 2
 
@@ -120,5 +114,5 @@ class Game:
         next_hands = deepcopy(game_state[1])
 
         next_hands[game_state[0]].remove(action)
-        return (next_active_player, next_hands, history, terminal, ante, game_state[5], bet_id)
+        return (next_active_player, next_hands, history, terminal, ante, game_state[5])
 

@@ -65,23 +65,7 @@ class Heuristic:
 
             # Define rules using the info_key
             # A passive player who plays highest card if winnable and lowest otherwise
-            if 'Bet' in possible_actions:
-                # rules for betting/checking
-                if self.reacting(game_state):
-                    infoset.heuristic_update(1, self.confidence)
-                    infoset.heuristic_update(0, 1-self.confidence)
-                else:
-                    hand = game_state[1][game_state[0]]
-                    hand_strength = sum(map(lambda x: x[1], hand)) / len(hand)
-                    avg_deck = self.avg_deck(game_state)
-                    if avg_deck < hand_strength:
-                        infoset.heuristic_update(1, 1-self.confidence)
-                        infoset.heuristic_update(0, self.confidence)
-                    else:
-                        infoset.heuristic_update(1, self.confidence)
-                        infoset.heuristic_update(0, 1-self.confidence)
-
-            elif 'Call' in possible_actions:
+            if 'Call' in possible_actions:
                 # Rules for calling/folding
 
                 hand = game_state[1][game_state[0]]

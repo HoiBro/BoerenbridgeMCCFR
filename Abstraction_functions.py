@@ -29,15 +29,6 @@ def possible(hand, hist, pos, mean):
     return new_hand, hist
 
 
-def remove_bets(hist):
-    """A helper function which removes the betting actions from a history"""
-    new_hist = ()
-    for action in hist:
-        if action not in ['Call', 'Check', 'Bet']:
-            new_hist += (action,)
-    return new_hist
-
-
 def advanced(hand, hist, pos, mean):
     """Advanced abstraction which replaces the hand with a list containing avg hand, number of suits and
     number of high cards, and the history without betting order"""
@@ -47,7 +38,7 @@ def advanced(hand, hist, pos, mean):
     else:
         hand_str = sum(map(lambda x: x[1], hand)) / len(hand)
 
-    new_hist = remove_bets(hist) + (hist.count('Call'),)
+    new_hist = (hist.count('Call'),)
     suits = set()
     for card in hand:
         suits.add(card[0])
@@ -60,7 +51,7 @@ def advanced(hand, hist, pos, mean):
 def adv_hist(hand, hist, pos, mean):
     """Abstract away the betting order"""
 
-    new_hist = remove_bets(hist) + (hist.count('Call'),)
+    new_hist = (hist.count('Call'),)
 
     return hand, new_hist
 
