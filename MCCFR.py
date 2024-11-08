@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from tqdm import tqdm
 import random
@@ -23,23 +24,6 @@ class MCCFR:
             self.infoset_dict[info_key] = Infoset(info_key)
         return self.infoset_dict[info_key]
 
-    def comb(self, n, k):
-        """Function which returns the number of combinations."""
-        m = 0
-        if k == 0:
-            m = 1
-        if k == 1:
-            m = n
-        if k >= 2:
-            num, dem, op1, op2 = 1, 1, k, n
-            while (op1 >= 1):
-                num *= op2
-                dem *= op1
-                op1 -= 1
-                op2 -= 1
-            m = num // dem
-        return m
-
     def get_info_key(self, game_state):
         """Function which generates an info_key, given a game_state. First the suits are abstracted using the
         suit dict, after which the abstraction function is used for further abstraction."""
@@ -56,7 +40,7 @@ class MCCFR:
 
         # Base case
         if game_state[3]:
-            return game_state[4]
+            return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
         counterfactual_values = np.zeros(len(possible_actions))
@@ -100,14 +84,9 @@ class MCCFR:
     def external_cfr(self, game_state, reach_probs, update_player):
         """Recursive function for external sampled MCCFR."""
 
-        player = game_state[0]
-        opponent = (player + 1) % 2
-
         # Base case
         if game_state[3]:
-            if game_state[4][player] == game_state[5][player]:
-                return 10 + 2*game_state[5][player] + 2*abs(game_state[4][opponent] - game_state[5][opponent])
-            return 2*(abs(game_state[4][opponent] - game_state[5][opponent]) - abs(game_state[4][player] - game_state[5][player]))
+            return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
         counterfactual_values = np.zeros(len(possible_actions))
@@ -121,6 +100,8 @@ class MCCFR:
             node_value = payoff * self.external_cfr(next_game_state, reach_probs, update_player)
 
         else:
+            player = game_state[0]
+            opponent = (player + 1) % 2
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
 
@@ -232,8 +213,8 @@ class MCCFR:
     def evaluate(self):
         """Evaluates the current infodict by multiplying the probabilities of the
         terminal notes with the utilities of those notes"""
-        hand_prob = (self.comb(len(self.game.deck.deck2), self.game.handsize) *
-                     self.comb(len(self.game.deck.deck2) - self.game.handsize, self.game.handsize))
+        hand_prob = (math.comb(len(self.game.deck.deck2), self.game.handsize) *
+                     math.comb(len(self.game.deck.deck2) - self.game.handsize, self.game.handsize))
         util = 0
         for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2):
             for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
