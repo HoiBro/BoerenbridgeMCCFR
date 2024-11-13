@@ -48,14 +48,6 @@ def advanced(hand, hist, pos, mean):
     return new_hand, new_hist
 
 
-def adv_hist(hand, hist, pos, mean):
-    """Abstract away the betting order"""
-
-    new_hist = (hist.count('Call'),)
-
-    return hand, new_hist
-
-
 def adv_hand(hand, hist, pos, mean):
     """Abstract away the hand to a list containing avg hand, number of suits and number of high cards,"""
 

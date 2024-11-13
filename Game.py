@@ -78,7 +78,9 @@ class Game:
         """Function which uses a game state to determine the possible actions as a list from this game state."""
         actions = sorted(game_state[1][game_state[0]])
 
-        if len(game_state[2]) % 2 == 0:
+        if len(game_state[2]) < 2:
+            return np.arange(self.handsize + 1)
+        elif len(game_state[2]) % 2 == 0:
             return actions
         else:
             # Players have to play the same suit, unless they can not.
@@ -98,7 +100,7 @@ class Game:
         next_active_player = (game_state[0] + 1) % 2
 
         # The same player only plays twice in a row if she wins a round as a reacting player.
-        if len(game_state[2]) % 2 == 1 & ((action[0] == game_state[2][-1][0]) & (game_state[2][-1][1] < action[1])):
+        if (len(game_state[2]) % 2 == 1) & ((action[0] == game_state[2][-1][0]) & (game_state[2][-1][1] < action[1])):
             next_active_player = game_state[0]
 
         history = game_state[2] + (action,)

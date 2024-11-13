@@ -1,4 +1,4 @@
-from Abstraction_functions import simple, identity, naive, possible, advanced, adv_hand, adv_hist, simple_hand
+from Abstraction_functions import simple, identity, naive, possible, advanced, adv_hand, simple_hand
 import wandb
 from Experiment_functions import full_abstraction, abstraction_func
 import argparse
@@ -21,7 +21,6 @@ def main():
         "sim": simple,
         "naive": naive,
         "hand": adv_hand,
-        "hist": adv_hist,
         "sim_hand": simple_hand
     }
     abstraction_func(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,

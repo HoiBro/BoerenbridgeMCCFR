@@ -135,8 +135,7 @@ class MCCFR:
                     next_game_state = self.game.get_next_game_state(game_state, action)
                     if game_state[0] == next_game_state[0]:
                         payoff = 1
-                    counterfactual_values[ix] = payoff * self.external_cfr(next_game_state, new_reach_probs,
-                                                                           update_player)
+                    counterfactual_values[ix] = payoff * self.external_cfr(next_game_state, new_reach_probs, update_player)
 
                 # Value of the current game state is counterfactual values weighted by the strategy
                 node_value = counterfactual_values.dot(strategy)
