@@ -33,7 +33,7 @@ class Play:
         """Recursive function for playing a round by sampling from the given infordicts.
         first_player: info_dicts index for starting player"""
         game_state = self.game.sample_new_game()
-        while not game_state[3]:
+        while game_state[3] != 2:
             possible_actions = self.game.get_possible_actions(game_state)
             if len(possible_actions) == 1:
                 game_state = self.game.get_next_game_state(game_state, possible_actions[0])

@@ -39,7 +39,7 @@ class MCCFR:
         """Recursive function for chance sampled MCCFR."""
 
         # Base case
-        if game_state[3]:
+        if game_state[3] == 2:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
@@ -85,7 +85,7 @@ class MCCFR:
         """Recursive function for external sampled MCCFR."""
 
         # Base case
-        if game_state[3]:
+        if game_state[3] == 2:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
@@ -173,7 +173,7 @@ class MCCFR:
         """Function which recursively finds the expected utility."""
 
         # Base case
-        if game_state[3]:
+        if game_state[3] == 2:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
@@ -265,7 +265,7 @@ class MCCFR:
             print('')
         print(f"Your hand is: {game_state[1][first_player]} \n The history is {game_state[2]}", end='\r')
         print('')
-        while not game_state[3]:
+        while game_state[3] != 2:
             possible_actions = self.game.get_possible_actions(game_state)
             if game_state[0] == first_player:
                 print(f"You have the following possible actions: {possible_actions}")
