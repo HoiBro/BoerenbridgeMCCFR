@@ -11,7 +11,9 @@ deck = Deck(suits, ranks)
 game = Game(deck, hand_size)
 mccfr = MCCFR(game, identity)
 
-mccfr.play_game(15, True)
+new_game = game.sample_new_game()
+# mccfr.play_game(15, True)
 
 
-print(deck.deck1)
+# print(deck.deck1)
+print(game.translate_suits(new_game))

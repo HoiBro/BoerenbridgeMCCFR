@@ -49,10 +49,7 @@ class Game:
             new_card = (suit_dict[card[0]], card[1])
             new_hand.append(new_card)
         for card in hist:
-            if len(card) == 2:
-                new_hist += ((suit_dict[card[0]], card[1]),)
-            else:
-                new_hist += (card,)
+            new_hist += ((suit_dict[card[0]], card[1]),)
         return new_hand, new_hist
 
     def sample_new_game(self, hands=None):

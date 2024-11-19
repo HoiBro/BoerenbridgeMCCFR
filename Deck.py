@@ -8,7 +8,7 @@ class Deck:
     def __init__(self, suits, ranks):
         """Initialize a deck for a given number of ranks and suits."""
 
-        self.suit = ('spades', 'hearts', 'clubs', 'diamonds')
+        self.suit = ('clubs', 'diamonds', 'hearts', 'spades')
         self.ranks = (13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
         self.suit = self.suit[:suits]
         self.ranks = self.ranks[:ranks]
