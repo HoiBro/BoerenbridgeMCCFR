@@ -211,7 +211,7 @@ class MCCFR:
 
     def evaluate(self):
         """Evaluates the current infodict by multiplying the probabilities of the
-        terminal notes with the utilities of those notes"""
+        terminal nodes with the utilities of those notes"""
         hand_prob = (math.comb(len(self.game.deck.deck2), self.game.handsize) *
                      math.comb(len(self.game.deck.deck2) - self.game.handsize, self.game.handsize))
         util = 0
