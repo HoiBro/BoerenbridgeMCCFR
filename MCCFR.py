@@ -39,7 +39,7 @@ class MCCFR:
         """Recursive function for chance sampled MCCFR."""
 
         # Base case
-        if game_state[3] == 2:
+        if game_state[3]:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
@@ -85,7 +85,7 @@ class MCCFR:
         """Recursive function for external sampled MCCFR."""
 
         # Base case
-        if game_state[3] == 2:
+        if game_state[3]:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
@@ -104,10 +104,10 @@ class MCCFR:
             opponent = (player + 1) % 2
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
+            strategy = infoset.regret_matching()
 
             # External gets sampled
             if player != update_player:
-                strategy = infoset.regret_matching()
                 action = random.choices(possible_actions, strategy)[0]
                 action_index = list(possible_actions).index(action)
                 action_prob = strategy[action_index]
@@ -122,7 +122,6 @@ class MCCFR:
                 node_value = payoff * self.external_cfr(next_game_state, new_reach_probs, update_player)
 
             else:
-                strategy = infoset.regret_matching()
                 infoset.update_strategy_sum(reach_probs[player])
                 for ix, action in enumerate(possible_actions):
                     action_prob = strategy[ix]
@@ -173,12 +172,12 @@ class MCCFR:
         """Function which recursively finds the expected utility."""
 
         # Base case
-        if game_state[3] == 2:
+        if game_state[3]:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
-        payoff = -1
         partial_values = np.zeros(len(possible_actions))
+        payoff = -1
 
         # If only 1 possible action, no strategy required.
         if len(possible_actions) == 1:
@@ -257,7 +256,7 @@ class MCCFR:
         self.infoset_data = (self.infoset_dict, self.abstraction_function)
 
     def play_round(self, first_player, verbose):
-        """Recursive function for playing a round by sampling from the given infordict. And allowing the input to play.
+        """Recursive function for playing a round by sampling from the given infodict. And allowing the input to play.
                 first_player: info_dicts index for starting player"""
         game_state = self.game.sample_new_game()
         if verbose:
@@ -265,7 +264,7 @@ class MCCFR:
             print('')
         print(f"Your hand is: {game_state[1][first_player]} \n The history is {game_state[2]}", end='\r')
         print('')
-        while game_state[3] != 2:
+        while not game_state[3]:
             possible_actions = self.game.get_possible_actions(game_state)
             if game_state[0] == first_player:
                 print(f"You have the following possible actions: {possible_actions}")
@@ -286,7 +285,7 @@ class MCCFR:
             else:
                 if len(possible_actions) == 1:
                     if verbose:
-                        print(f"Your opponent played the following action: {possible_actions[0]} as her only action")
+                        print(f"Your opponent played the following action: {possible_actions[0]} as their only action")
                     else:
                         print(f"Your opponent played the following action: {possible_actions[0]}")
 
@@ -300,17 +299,15 @@ class MCCFR:
                     if verbose:
                         print(f"Your opponent had the following possible actions: {possible_actions} with the "
                               f"following probabilities: {strategy}")
-                        print(f"Your opponent played the following action: {action}")
-                    else:
-                        print(f"Your opponent played the following action: {action}")
+                    print(f"Your opponent played the following action: {action}")
 
                     game_state = self.game.get_next_game_state(game_state, action)
 
         sign_starting_player = (game_state[0] * -2) + 1
-        return sign_starting_player * game_state[4]
+        return 2 * sign_starting_player * self.game.get_payoff(game_state)
 
     def play_game(self, winning_score, verbose=False):
-        """Play a first to 15game as a player against the generated strategy."""
+        """Play a first to n game as a player against the generated strategy."""
         score1 = 0
         score2 = 0
         i = 1
@@ -320,10 +317,10 @@ class MCCFR:
             payoff = self.play_round(i, verbose)
             print('')
             if payoff * ((i * -2) + 1) < 0:
-                print(f"Your opponent won with an ante of {abs(payoff)}")
+                print(f"Your opponent won with a score of {abs(payoff)}")
                 score2 += abs(payoff)
             else:
-                print(f"You won with an ante of {abs(payoff)}")
+                print(f"You won with a score of {abs(payoff)}")
                 score1 += abs(payoff)
             print(f"The score is You: {score1}, Opponent: {score2}")
             print('')
