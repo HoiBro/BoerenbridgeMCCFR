@@ -303,8 +303,18 @@ class MCCFR:
 
                     game_state = self.game.get_next_game_state(game_state, action)
 
-        sign_starting_player = (game_state[0] * -2) + 1
-        return 2 * sign_starting_player * self.game.get_payoff(game_state)
+        p_bets = game_state[2][first_player]
+        p_wins = self.game.wins[first_player]
+        o_bets = game_state[2][(first_player + 1) % 2]
+        o_wins = self.game.wins[(first_player + 1) % 2]
+        if p_bets == p_wins and o_bets == o_wins:
+            return [10 + 2*p_bets, 10 + 2*o_bets]
+        elif p_bets == p_wins:
+            return [10 + 2*p_bets, -2*abs(o_bets - o_wins)]
+        elif o_bets == o_wins:
+            return [-2*abs(p_bets - p_wins), 10 + 2*o_bets]
+        else:
+            return [-2*abs(p_bets - p_wins), -2*abs(o_bets - o_wins)]
 
     def play_game(self, winning_score, verbose=False):
         """Play a first to n game as a player against the generated strategy."""
@@ -316,12 +326,16 @@ class MCCFR:
             i = (i + 1) % 2
             payoff = self.play_round(i, verbose)
             print('')
-            if payoff * ((i * -2) + 1) < 0:
-                print(f"Your opponent won with a score of {abs(payoff)}")
-                score2 += abs(payoff)
+            if payoff[0] > 0:
+                print(f"You won with a score of {payoff[0]}")
             else:
-                print(f"You won with a score of {abs(payoff)}")
-                score1 += abs(payoff)
+                print(f"You lost with a score of {-1*payoff[0]}")
+            if payoff[1] > 0:
+                print(f"Your opponent won with a score of {payoff[1]}")
+            else:
+                print(f"Your opponent lost with a score of {-1*payoff[1]}")
+            score1 += payoff[0]
+            score2 += payoff[1]
             print(f"The score is You: {score1}, Opponent: {score2}")
             print('')
         final = 'won'

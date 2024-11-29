@@ -12,7 +12,7 @@ game = Game(deck, hand_size)
 mccfr = MCCFR(game, identity)
 
 # new_game = game.sample_new_game()
-mccfr.play_game(15, True)
+mccfr.play_game(100)
 
 
 # print(deck.deck1)
