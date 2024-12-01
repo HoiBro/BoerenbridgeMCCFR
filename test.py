@@ -14,6 +14,6 @@ mccfr = MCCFR(game, identity)
 # new_game = game.sample_new_game()
 mccfr.play_game(100)
 
-
+# print(new_game[1])
 # print(deck.deck1)
 # print(game.translate_suits(new_game))

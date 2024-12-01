@@ -55,23 +55,23 @@ class Game:
     def sample_new_game(self, hands=None):
         """Function to sample an initial game state with an empty history. Optionality to provide hands instead of
         uniformly sampling a hand. Game state has form:
-        (active_player, hands, history, terminal, suit_dicts) where,
+        (active_player, cards, history, terminal, suit_dicts) where,
         active_player = 0 or 1 for player 0 or 1.
-        hands = a list of lists, one for each player, containing cards which are tuples of the form: (suit, rank)
+        cards = a list of 2 lists and one trump, one list for each player, the lists contain cards which are tuples of the form: (suit, rank)
         history = tuple containing all actions in order
         terminal = boolean indicating whether the state is terminal
         suit_dicts = list of suit_dicts, one for each player"""
         if hands:
-            hands = [sorted(hands[0]), sorted(hands[1])]
+            cards = [sorted(hands[0]), sorted(hands[1]), hands[2]]
             suit_dicts = [self.suit_abstraction_dict(hands[0]), self.suit_abstraction_dict(hands[1])]
             self.wins = [0, 0]
-            return (0, hands, (), False, suit_dicts)
+            return (0, cards, (), False, suit_dicts)
         else:
-            two_hands = random.sample(self.deck.deck2, 2 * self.handsize)
-            hands = [sorted(two_hands[self.handsize:]), sorted(two_hands[:self.handsize])]
-            suit_dicts = [self.suit_abstraction_dict(hands[0]), self.suit_abstraction_dict(hands[1])]
+            game_cards = random.sample(self.deck.deck2, 2 * self.handsize + 1)
+            cards = [sorted(game_cards[self.handsize + 1:]), sorted(game_cards[:self.handsize]), game_cards[self.handsize]]
+            suit_dicts = [self.suit_abstraction_dict(cards[0]), self.suit_abstraction_dict(cards[1])]
             self.wins = [0, 0]
-            return (0, hands, (), False, suit_dicts)
+            return (0, cards, (), False, suit_dicts)
 
     def get_possible_actions(self, game_state):
         """Function which uses a game state to determine the possible actions as a list from this game state."""
@@ -104,7 +104,7 @@ class Game:
             next_hands[game_state[0]].remove(action)
 
         # The same player only plays twice in a row if they win a round as a reacting player.
-        if len(history) > 2 and len(history) % 2 == 0 and action[0] == game_state[2][-1][0] and game_state[2][-1][1] < action[1]:
+        if len(history) > 2 and len(history) % 2 == 0 and (action[0] == game_state[2][-1][0] and game_state[2][-1][1] < action[1] or action[0] == game_state[1][2][0] and game_state[2][-1][0] != game_state[1][2][0]):
             next_active_player = game_state[0]
         
         if len(history) > 2 and len(history) % 2 == 0:

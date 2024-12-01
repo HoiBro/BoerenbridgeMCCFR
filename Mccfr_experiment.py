@@ -21,7 +21,7 @@ def main():
 
 if __name__ == '__main__':
 
-    wandb.init(project='thesis', group='exploit')
+    wandb.init(project='BoerenbridgeAI', group='Tests')
     config = wandb.config
 
     # Command line arguments

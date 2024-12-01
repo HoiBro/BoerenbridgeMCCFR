@@ -32,7 +32,7 @@ class MCCFR:
         possible_action_len = len(possible_action)
         new_hand, new_hist = self.game.translate_suits(game_state)
         abs_hand, abs_hist = self.abstraction_function(new_hand, new_hist, possible_action, self.game.mean)
-        key = (game_state[0], frozenset(abs_hand), abs_hist, possible_action_len)
+        key = (game_state[0], frozenset(abs_hand), game_state[1][2], abs_hist, possible_action_len)
         return key
 
     def chance_cfr(self, game_state, reach_probs):
@@ -210,7 +210,7 @@ class MCCFR:
 
     def evaluate(self):
         """Evaluates the current infodict by multiplying the probabilities of the
-        terminal nodes with the utilities of those notes"""
+        terminal nodes with the utilities of those nodes"""
         hand_prob = (math.comb(len(self.game.deck.deck2), self.game.handsize) *
                      math.comb(len(self.game.deck.deck2) - self.game.handsize, self.game.handsize))
         util = 0
@@ -262,7 +262,7 @@ class MCCFR:
         if verbose:
             print(f"Your opponent's hand is: {game_state[1][(first_player + 1) % 2]}")
             print('')
-        print(f"Your hand is: {game_state[1][first_player]} \n The history is {game_state[2]}", end='\r')
+        print(f"Your hand is: {game_state[1][first_player]} \n The history is {game_state[2]} \n The trump is {game_state[1][2]}", end='\r')
         print('')
         while not game_state[3]:
             possible_actions = self.game.get_possible_actions(game_state)

@@ -6,7 +6,7 @@ class Infoset:
     def __init__(self, info_key):
         """Initialize an infoset for a given an info_key. The key must contain the number of possible actions."""
         self.info_key = info_key
-        self.num_actions = info_key[3]
+        self.num_actions = info_key[4]
         self.cumulative_regrets = np.zeros(self.num_actions)
         self.strategy_sum = np.zeros(self.num_actions)
         self.average_strategy = np.repeat(1 / self.num_actions, self.num_actions)
