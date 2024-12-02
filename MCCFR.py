@@ -6,6 +6,7 @@ from copy import deepcopy
 import itertools
 from Infoset import Infoset
 import pickle
+import os
 
 
 class MCCFR:
@@ -247,7 +248,9 @@ class MCCFR:
 
     def save_dict(self, name):
         """Save information dict as pickle."""
-        a_file = open(f"Dicts/{name}.pkl", "wb")
+        filename = f"Dicts/{name}.pkl"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        a_file = open(filename, "wb")
         pickle.dump(self.infoset_dict, a_file)
         a_file.close()
 

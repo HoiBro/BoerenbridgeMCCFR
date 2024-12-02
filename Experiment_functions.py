@@ -27,6 +27,8 @@ def exploit(suits, ranks, hand_size, train_iterations, intervals, eval_iteration
         mccfr.train_external(iterations_per_interval)
         wandb.log({f"exploitability": mccfr.get_exploitability(eval_iterations),
                    'iteration': 10000 + ((i+1)*iterations_per_interval)})
+    mccfr.save_dict("test1")
+    mccfr.play_game(100, True)
 
 
 def full_abstraction(suits, ranks, hand_size, train_iterations, intervals, eval_iterations):

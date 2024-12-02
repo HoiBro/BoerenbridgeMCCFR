@@ -3,16 +3,17 @@ from Game import Game
 from MCCFR import MCCFR
 from Abstraction_functions import simple, identity, naive, possible, advanced
 
-suits = 4
-ranks = 13
-hand_size = 4
+suits = 2
+ranks = 3
+hand_size = 2
 
 deck = Deck(suits, ranks)
 game = Game(deck, hand_size)
 mccfr = MCCFR(game, identity)
 
 # new_game = game.sample_new_game()
-mccfr.play_game(100)
+mccfr.load_dict("test1")
+mccfr.play_game(100, True)
 
 # print(new_game[1])
 # print(deck.deck1)

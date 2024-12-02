@@ -8,9 +8,9 @@ import argparse
 suits = 2
 ranks = 3
 hand_size = 2
-train_iterations = 40000
-intervals = 400
-eval_iterations = 10000
+train_iterations = 100000
+intervals = 1
+eval_iterations = 25000
 FLAGS = None
 
 
