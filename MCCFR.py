@@ -214,14 +214,17 @@ class MCCFR:
         hand_prob = (math.comb(len(self.game.deck.deck2), self.game.handsize) *
                      math.comb(len(self.game.deck.deck2) - self.game.handsize, self.game.handsize))
         util = 0
-        for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2):
+        for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2 + 1):
             for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
-                hand2 = list(card for card in dealt_cards if card not in hand1)
-                hands = [sorted(list(hand1)), sorted(hand2)]
-                game_state = self.game.sample_new_game(hands=hands)
+                for trump in list(card for card in dealt_cards if card not in hand1):
+                    hand2 = list(card for card in dealt_cards
+                                 if card not in hand1
+                                 if card not in trump)
+                    hands = [sorted(list(hand1)), sorted(hand2), trump]
+                    game_state = self.game.sample_new_game(hands=hands)
 
-                reach_prob = 1
-                util += self.evaluate_helper(game_state, reach_prob)
+                    reach_prob = 1
+                    util += self.evaluate_helper(game_state, reach_prob)
         return util / hand_prob
 
     def get_exploitability(self, num_iterations):
