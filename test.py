@@ -1,7 +1,7 @@
 from Deck import Deck
 from Game import Game
 from MCCFR import MCCFR
-from Abstraction_functions import simple, identity, naive, possible, advanced
+from Abstraction_functions import identity, simple, naive, advanced
 
 suits = 2
 ranks = 3

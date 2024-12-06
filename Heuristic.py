@@ -1,7 +1,7 @@
 from Infoset import Infoset
 import random
 import itertools
-
+import numpy as np
 
 class Heuristic:
     """Class which can generate a strategy, using heuristic rules."""
@@ -22,8 +22,7 @@ class Heuristic:
 
     def get_info_key(self, game_state):
         """Function which generates an info_key, given a game_state. First the suits are abstracted using the
-                suit dict, after which the abstraction function is used for further abstraction."""
-
+        suit dict, after which the abstraction function is used for further abstraction."""
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
         new_hand, new_hist = self.game.translate_suits(game_state)
@@ -36,16 +35,12 @@ class Heuristic:
         deck = self.game.deck.deck2.copy()
         hand = game_state[1][game_state[0]]
         for action in game_state[2]:
-            if len(action) == 2:
+            if not isinstance(action, np.int64):
                 deck.remove(action)
-
         return sum(map(lambda x: x[1], deck)) / len(deck)
-
-
 
     def reacting(self, game_state):
         """return False if first player of round and first card if not"""
-
         if len(game_state[2]) % 2 == 0:
             return False
         else:
@@ -54,7 +49,7 @@ class Heuristic:
     def heuristic(self, game_state):
         """Recursive function which updates the infosets. Use this function to define your heuristic strat"""
         if game_state[3]:
-            return game_state[4]
+            return self.game.get_payoff(game_state)
         possible_actions = self.game.get_possible_actions(game_state)
 
         if len(possible_actions) == 1:
@@ -102,12 +97,15 @@ class Heuristic:
 
     def make_dict(self):
         """Create the dict for all possible infosets."""
-        for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2):
+        for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2 + 1):
             for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
-                hand2 = list(card for card in dealt_cards if card not in hand1)
-                hands = [sorted(list(hand1)), sorted(hand2)]
-                game_state = self.game.sample_new_game(hands=hands)
-                self.heuristic(game_state)
+                for trump in list(card for card in dealt_cards if card not in hand1):
+                    hand2 = list(card for card in dealt_cards
+                                 if card not in hand1
+                                 if card not in trump)
+                    hands = [sorted(list(hand1)), sorted(hand2), trump]
+                    game_state = self.game.sample_new_game(hands=hands)
+                    self.heuristic(game_state)
 
     def count_infosets(self):
         """Count total number of infosets in the dict."""

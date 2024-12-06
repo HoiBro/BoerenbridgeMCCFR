@@ -3,6 +3,7 @@ import numpy as np
 
 class Infoset:
     """Class to represent an information set. Contains functions to update the regret and strategy."""
+    
     def __init__(self, info_key):
         """Initialize an infoset for a given an info_key. The key must contain the number of possible actions."""
         self.info_key = info_key

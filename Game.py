@@ -14,7 +14,7 @@ class Game:
         self.wins = [0, 0]
         self.mean = np.mean(deck.ranks)
 
-    def suit_abstraction_dict(self, hand, identity=False):
+    def suit_abstraction_dict(self, hand, trump):
         """Function to create a suit dict for card isomorphism. Each suit is mapped to an abstraction which
         is specific for the initial hand."""
         suits = self.deck.suit
@@ -24,6 +24,9 @@ class Game:
 
         hand.sort(key=lambda x: x[1])
 
+        suit_dict[trump[0]] = 'first'
+        check_val.add(trump[0])
+
         for card in hand:
             if card[0] not in check_val:
                 suit_dict[card[0]] = suit_abstraction[len(check_val)]
@@ -32,8 +35,6 @@ class Game:
             if suit not in check_val:
                 suit_dict[suit] = suit_abstraction[len(check_val)]
                 check_val.add(suit)
-        if identity:
-            suit_dict = {'clubs': 'first', 'diamonds': 'second', 'hearts': 'third', 'spades': 'fourth'}
         return suit_dict
 
     @staticmethod
@@ -60,16 +61,16 @@ class Game:
         cards = a list of 2 lists and one trump, one list for each player, the lists contain cards which are tuples of the form: (suit, rank)
         history = tuple containing all actions in order
         terminal = boolean indicating whether the state is terminal
-        suit_dicts = list of suit_dicts, one for each player"""
+        suit_dicts = list of suit dicts, one for each player"""
         if hands:
             cards = [sorted(hands[0]), sorted(hands[1]), hands[2]]
-            suit_dicts = [self.suit_abstraction_dict(hands[0]), self.suit_abstraction_dict(hands[1])]
+            suit_dicts = [self.suit_abstraction_dict(hands[0], hands[2]), self.suit_abstraction_dict(hands[1], hands[2])]
             self.wins = [0, 0]
             return (0, cards, (), False, suit_dicts)
         else:
             game_cards = random.sample(self.deck.deck2, 2 * self.handsize + 1)
             cards = [sorted(game_cards[self.handsize + 1:]), sorted(game_cards[:self.handsize]), game_cards[self.handsize]]
-            suit_dicts = [self.suit_abstraction_dict(cards[0]), self.suit_abstraction_dict(cards[1])]
+            suit_dicts = [self.suit_abstraction_dict(cards[0], cards[2]), self.suit_abstraction_dict(cards[1], cards[2])]
             self.wins = [0, 0]
             return (0, cards, (), False, suit_dicts)
 

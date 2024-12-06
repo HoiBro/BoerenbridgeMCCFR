@@ -28,7 +28,6 @@ class MCCFR:
     def get_info_key(self, game_state):
         """Function which generates an info_key, given a game_state. First the suits are abstracted using the
         suit dict, after which the abstraction function is used for further abstraction."""
-
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
         new_hand, new_hist = self.game.translate_suits(game_state)
@@ -59,9 +58,9 @@ class MCCFR:
             opponent = (player + 1) % 2
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
-
             strategy = infoset.regret_matching()
             infoset.update_strategy_sum(reach_probs[player])
+
             for ix, action in enumerate(possible_actions):
                 action_prob = strategy[ix]
 
@@ -190,8 +189,8 @@ class MCCFR:
         else:
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
-
             strategy = infoset.get_average_strategy()
+
             for ix, action in enumerate(possible_actions):
                 action_prob = strategy[ix]
 
@@ -263,20 +262,25 @@ class MCCFR:
 
     def play_round(self, first_player, verbose):
         """Recursive function for playing a round by sampling from the given infodict. And allowing the input to play.
-                first_player: info_dicts index for starting player"""
+        first_player: info_dicts index for starting player"""
         game_state = self.game.sample_new_game()
         if verbose:
             print(f"Your opponent's hand is: {game_state[1][(first_player + 1) % 2]}")
-            print('')
-        print(f"Your hand is: {game_state[1][first_player]} \n The history is {game_state[2]} \n The trump is {game_state[1][2]}", end='\r')
+        print(f"Your hand is: {game_state[1][first_player]}")
+        print(f"The trump is {game_state[1][2]}")
+        print('')
+        print(f"The history is {game_state[2]}")
         print('')
         while not game_state[3]:
             possible_actions = self.game.get_possible_actions(game_state)
             if game_state[0] == first_player:
-                print(f"You have the following possible actions: {possible_actions}")
                 while True:
                     try:
-                        index = int(input('Give the index of the action you want to choose (starting from 0): '))
+                        if isinstance(possible_actions[0], np.int64):
+                            index = int(input(f'Give the amount you would like to bet (maximimum of {self.game.handsize}): '))
+                        else:
+                            print(f"You have the following possible actions: {possible_actions}")
+                            index = int(input('Give the index of the action you want to choose (starting from 0): '))
                     except ValueError:
                         print("Sorry, you didn't provide a valid index starting from 0, try again.")
                         continue
@@ -285,9 +289,9 @@ class MCCFR:
                         continue
                     else:
                         break
+                print('')
                 action = possible_actions[index]
                 game_state = self.game.get_next_game_state(game_state, action)
-
             else:
                 if len(possible_actions) == 1:
                     if verbose:
@@ -296,7 +300,6 @@ class MCCFR:
                         print(f"Your opponent played the following action: {possible_actions[0]}")
 
                     game_state = self.game.get_next_game_state(game_state, possible_actions[0])
-
                 else:
                     info_key = self.get_info_key(game_state)
                     infoset = self.get_infoset(info_key)
@@ -305,9 +308,12 @@ class MCCFR:
                     if verbose:
                         print(f"Your opponent had the following possible actions: {possible_actions} with the "
                               f"following probabilities: {strategy}")
-                    print(f"Your opponent played the following action: {action}")
-
+                    if isinstance(action, np.int64):
+                        print(f"Your opponent bet {action}")
+                    else:
+                        print(f"Your opponent played the following action: {action}")
                     game_state = self.game.get_next_game_state(game_state, action)
+                print('')
 
         p_bets = game_state[2][first_player]
         p_wins = self.game.wins[first_player]
@@ -327,11 +333,11 @@ class MCCFR:
         score1 = 0
         score2 = 0
         i = 1
-        print("Initializing a new game...")
+        print("Initializing new game...")
+        print('')
         while score1 < winning_score and score2 < winning_score:
             i = (i + 1) % 2
             payoff = self.play_round(i, verbose)
-            print('')
             if payoff[0] > 0:
                 print(f"You won with a score of {payoff[0]}")
             else:
@@ -342,7 +348,9 @@ class MCCFR:
                 print(f"Your opponent lost with a score of {-1*payoff[1]}")
             score1 += payoff[0]
             score2 += payoff[1]
+            print('')
             print(f"The score is You: {score1}, Opponent: {score2}")
+            print('')
             print('')
         final = 'won'
         if score2 > score1:
