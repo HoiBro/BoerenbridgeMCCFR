@@ -38,7 +38,6 @@ class Infoset:
 
     def get_average_strategy(self):
         """Return the average strategy from the sum of weighted strategies."""
-
         self.average_strategy = self.normalize(self.strategy_sum.copy())
 
         return self.average_strategy

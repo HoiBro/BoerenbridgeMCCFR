@@ -1,22 +1,27 @@
 
-def identity(hand, hist, pos, mean):
+def identity(hand, trump, hist, pos, mean):
     """No abstraction"""
-    return hand, hist
+    return hand, trump, hist
 
 
-def simple(hand, hist, pos, mean):
+def simple(hand, trump, hist, pos, mean):
     """Abstract away the entire history"""
-    return hand, ()
+    return hand, trump, ()
 
 
-def simple_hand(hand, hist, pos, mean):
+def simple_hand(hand, trump, hist, pos, mean):
     """Abstract away the entire hand"""
-    return [], hist
+    return [], trump, hist
 
 
-def naive(hand, hist, pos, mean):
+def naive(hand, trump, hist, pos, mean):
     """Least possible states"""
-    return [], ()
+    return [], (), ()
+
+
+def suit(hand, trump, hist, pos, mean):
+    """Abstract away the trumps rank"""
+    return hand, trump[0], hist
 
 
 def advanced(hand, hist, pos, mean):

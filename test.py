@@ -12,8 +12,10 @@ game = Game(deck, hand_size)
 mccfr = MCCFR(game, identity)
 
 # new_game = game.sample_new_game()
-mccfr.load_dict("test1")
-mccfr.play_game(100, True)
+test = mccfr.evaluate()
+print(test)
+#mccfr.load_dict("test1")
+#mccfr.play_game(100, True)
 
 # print(new_game[1])
 # print(deck.deck1)

@@ -31,8 +31,8 @@ class MCCFR:
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
         new_hand, new_hist = self.game.translate_suits(game_state)
-        abs_hand, abs_hist = self.abstraction_function(new_hand, new_hist, possible_action, self.game.mean)
-        key = (game_state[0], frozenset(abs_hand), game_state[1][2], abs_hist, possible_action_len)
+        abs_hand, abs_trump, abs_hist = self.abstraction_function(new_hand, game_state[1][2], new_hist, possible_action, self.game.mean)
+        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, possible_action_len)
         return key
 
     def chance_cfr(self, game_state, reach_probs):
@@ -211,21 +211,23 @@ class MCCFR:
     def evaluate(self):
         """Evaluates the current infodict by multiplying the probabilities of the
         terminal nodes with the utilities of those nodes"""
-        hand_prob = (math.comb(len(self.game.deck.deck2), self.game.handsize) *
-                     math.comb(len(self.game.deck.deck2) - self.game.handsize, self.game.handsize))
+        hand_prob = (len(self.game.deck.deck2) *
+                     math.comb(len(self.game.deck.deck2) - 1, self.game.handsize) *
+                     math.comb(len(self.game.deck.deck2) - self.game.handsize - 1, self.game.handsize))
         util = 0
-        for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2 + 1):
-            for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
-                for trump in list(card for card in dealt_cards if card not in hand1):
-                    hand2 = list(card for card in dealt_cards
-                                 if card not in hand1
-                                 if card not in trump)
-                    hands = [sorted(list(hand1)), sorted(hand2), trump]
+        for trump in self.game.deck.ranks:
+            self.game.deck.reset_deck()
+            self.game.deck.deck1.remove((self.game.deck.suit[0], trump))
+            for dealt_cards in itertools.combinations(self.game.deck.deck1, self.game.handsize * 2):
+                for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
+                    hand2 = list(card for card in dealt_cards if card not in hand1)
+                    
+                    hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
                     game_state = self.game.sample_new_game(hands=hands)
 
                     reach_prob = 1
                     util += self.evaluate_helper(game_state, reach_prob)
-        return util / hand_prob
+        return len(self.game.deck.suit) * util / hand_prob
 
     def get_exploitability(self, num_iterations):
         """Use MCCFR to update just one player and evaluate after. Doing this for both players approximates the

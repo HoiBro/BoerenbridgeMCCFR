@@ -135,7 +135,7 @@ def abstraction_func(suits, ranks, hand_size, starting_iterations, train_iterati
         wandb.log({f"infoset_size_{abstraction.__name__}": infoset_size_abs,
                    f'infoset_size_non': infoset_size_normal,
                    f'points_{abstraction.__name__}': result_abs[1],
-                   f'result_{abstraction.__name__}': result_abs,
+                   f'result_{abstraction.__name__}': result_abs[0],
                    f'infoset_size_max': 376958,
                    'iteration': (i+1)*iterations_per_interval})
     if name != '':

@@ -9,12 +9,12 @@ suits = 2
 ranks = 3
 hand_size = 2
 starting_iterations = 0
-train_iterations = 10000
-intervals = 400
-eval_iterations = 2500
+train_iterations = 5000
+intervals = 1
+eval_iterations = 1000
 run_name = ''
 abstraction = ""
-amount = 1
+amount = 5
 FLAGS = None
 
 
@@ -26,7 +26,7 @@ def main():
         "naive": naive
     }
     if abstraction == '':
-        exploit_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+        full_abstraction_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, FLAGS.amount)
     else:
         abstraction_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations, FLAGS.train_iterations,
