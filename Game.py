@@ -24,16 +24,16 @@ class Game:
 
         hand.sort(key=lambda x: x[1])
 
-        suit_dict[trump[0]] = 'first'
+        suit_dict[trump[0]] = 'fourth'
         check_val.add(trump[0])
 
         for card in hand:
             if card[0] not in check_val:
-                suit_dict[card[0]] = suit_abstraction[len(check_val)]
+                suit_dict[card[0]] = suit_abstraction[len(check_val) - 1]
                 check_val.add(card[0])
         for suit in suits:
             if suit not in check_val:
-                suit_dict[suit] = suit_abstraction[len(check_val)]
+                suit_dict[suit] = suit_abstraction[len(check_val) - 1]
                 check_val.add(suit)
         return suit_dict
 

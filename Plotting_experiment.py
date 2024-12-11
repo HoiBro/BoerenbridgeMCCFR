@@ -1,4 +1,4 @@
-from Abstraction_functions import identity, simple, simple_hand, naive, advanced
+from Abstraction_functions import identity, simple, simple_hand, naive, suit, advanced
 from Plotting_functions import exploit_plotter, abstraction_plotter, full_abstraction_plotter
 import argparse
 
@@ -9,12 +9,12 @@ suits = 2
 ranks = 3
 hand_size = 2
 starting_iterations = 0
-train_iterations = 5000
-intervals = 1
-eval_iterations = 1000
-run_name = ''
+train_iterations = 100000
+intervals = 100
+eval_iterations = 10000
+run_name = 'Big100000'
 abstraction = ""
-amount = 5
+amount = 1
 FLAGS = None
 
 
@@ -23,11 +23,15 @@ def main():
         "adv": advanced,
         "sim": simple,
         "sim_hand": simple_hand,
-        "naive": naive
+        "naive": naive,
+        "suit": suit
     }
     if abstraction == '':
-        full_abstraction_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+        exploit_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, FLAGS.amount)
+    elif abstraction == 'full':
+        full_abstraction_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                                 FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, FLAGS.amount)
     else:
         abstraction_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations, FLAGS.train_iterations,
                             FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction], FLAGS.amount)

@@ -24,8 +24,8 @@ def suit(hand, trump, hist, pos, mean):
     return hand, trump[0], hist
 
 
-def advanced(hand, hist, pos, mean):
-    """Abstract away the hand to a list containing avg hand, number of suits and number of high cards,"""
+def advanced(hand, trump, hist, pos, mean):
+    """Abstract away the hand to a list containing avg hand, number of suits and number of high cards"""
     if len(hand) == 0:
         hand_str = 0
     else:
@@ -37,4 +37,4 @@ def advanced(hand, hist, pos, mean):
     high_cards = len([x for x in hand if x[1] > mean])
     new_hand = [hand_str, len(suits), high_cards]
 
-    return new_hand, hist
+    return new_hand, trump, hist
