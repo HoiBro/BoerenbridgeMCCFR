@@ -1,29 +1,36 @@
 import wandb
-from Experiment_functions import full_abstraction, abstraction_func, exploit
+from Experiment_functions import full_abstraction, abstraction_func, exploit, fast_exploit
 import argparse
 
 """This is the program, used for the MCCFR experiments."""
 
 # Default parameters
-suits = 3
+suits = 2
 ranks = 3
-hand_size = 3
+hand_size = 2
 starting_iterations = 0
 train_iterations = 100000
 intervals = 400
 eval_iterations = 2500
-run_name = 'DecentTest'
+run_name = 'DecentTest1'
 FLAGS = None
+
+fast = True
 
 
 def main():
-    exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
-            FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
+    if fast:
+        fast_exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                     FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
+    else:
+        exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
 
 
 if __name__ == '__main__':
-    wandb.init(project='BoerenbridgeAI', group='Tests', name=run_name)
-    config = wandb.config
+    if not fast:
+        wandb.init(project='BoerenbridgeAI', group='Tests', name=run_name)
+        config = wandb.config
 
     # Command line arguments
     parser = argparse.ArgumentParser()
@@ -44,6 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--run_name', type=str, default=run_name,
                         help='Name for the run/saved infodict')
     FLAGS, unparsed = parser.parse_known_args()
-    config.update(FLAGS)
+    if not fast:
+        config.update(FLAGS)
 
     main()
