@@ -6,13 +6,13 @@ import argparse
 
 # Default parameters
 suits = 2
-ranks = 3
-hand_size = 2
+ranks = 2
+hand_size = 1
 starting_iterations = 0
-train_iterations = 100000
+train_iterations = 10000
 intervals = 400
 eval_iterations = 2500
-run_name = 'DecentTest1'
+run_name = 'SmolTest1'
 FLAGS = None
 
 fast = True

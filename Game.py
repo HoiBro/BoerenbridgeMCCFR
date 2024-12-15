@@ -31,10 +31,9 @@ class Game:
                 suit_dict[card[0]] = suit_abstraction[len(check_val)]
                 check_val.add(card[0])
         for suit in suits:
-            if suit not in check_val:
+            if suit not in check_val and suit != trump[0]:
                 suit_dict[suit] = suit_abstraction[len(check_val)]
                 check_val.add(suit)
-        print(suit_dict)
         return suit_dict
 
     @staticmethod
@@ -42,16 +41,20 @@ class Game:
         """Function which translates all the suits in a game state, based on the suit dict."""
         suit_dict = game_state[4][game_state[0]]
         hand = game_state[1][game_state[0]]
+        trump = game_state[1][2]
         hist = game_state[2]
         new_hand = []
         new_hist = ()
         for card in hand:
             new_card = (suit_dict[card[0]], card[1])
             new_hand.append(new_card)
+        new_trump = (suit_dict[trump[0]], trump[1])
         for card in hist:
-            if not isinstance(card, np.int64):
+            if isinstance(card, np.int64):
+                new_hist += (int(card),)
+            else:
                 new_hist += ((suit_dict[card[0]], card[1]),)
-        return new_hand, new_hist
+        return new_hand, new_trump, new_hist
 
     def sample_new_game(self, hands=None):
         """Function to sample an initial game state with an empty history. Optionality to provide hands instead of
