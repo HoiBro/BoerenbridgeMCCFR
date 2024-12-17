@@ -11,7 +11,6 @@ class Game:
         self.deck = deck
         self.handsize = handsize
         self.deck.reset_deck()
-        self.wins = [0, 0]
         self.mean = np.mean(deck.ranks)
 
     def suit_abstraction_dict(self, hand, trump):
@@ -39,7 +38,7 @@ class Game:
     @staticmethod
     def translate_suits(game_state):
         """Function which translates all the suits in a game state, based on the suit dict."""
-        suit_dict = game_state[4][game_state[0]]
+        suit_dict = game_state[5][game_state[0]]
         hand = game_state[1][game_state[0]]
         trump = game_state[1][2]
         hist = game_state[2]
@@ -59,23 +58,22 @@ class Game:
     def sample_new_game(self, hands=None):
         """Function to sample an initial game state with an empty history. Optionality to provide hands instead of
         uniformly sampling a hand. Game state has form:
-        (active_player, cards, history, terminal, suit_dicts) where,
+        (active_player, cards, history, player_wins, terminal, suit_dicts) where,
         active_player = 0 or 1 for player 0 or 1.
         cards = a list of 2 lists and one trump, one list for each player, the lists contain cards which are tuples of the form: (suit, rank)
         history = tuple containing all actions in order
+        player_wins = the amount of wins both players have gotten
         terminal = boolean indicating whether the state is terminal
         suit_dicts = list of suit dicts, one for each player"""
         if hands:
             cards = [sorted(hands[0]), sorted(hands[1]), hands[2]]
             suit_dicts = [self.suit_abstraction_dict(hands[0], hands[2]), self.suit_abstraction_dict(hands[1], hands[2])]
-            self.wins = [0, 0]
-            return (0, cards, (), False, suit_dicts)
+            return (0, cards, (), np.zeros(2, dtype=int), False, suit_dicts)
         else:
             game_cards = random.sample(self.deck.deck2, 2 * self.handsize + 1)
             cards = [sorted(game_cards[self.handsize + 1:]), sorted(game_cards[:self.handsize]), game_cards[self.handsize]]
             suit_dicts = [self.suit_abstraction_dict(cards[0], cards[2]), self.suit_abstraction_dict(cards[1], cards[2])]
-            self.wins = [0, 0]
-            return (0, cards, (), False, suit_dicts)
+            return (0, cards, (), np.zeros(2, dtype=int), False, suit_dicts)
 
     def get_possible_actions(self, game_state):
         """Function which uses a game state to determine the possible actions as a list from this game state."""
@@ -100,6 +98,7 @@ class Game:
         next_active_player = (game_state[0] + 1) % 2
         next_hands = deepcopy(game_state[1])
         history = game_state[2] + (action,)
+        player_wins = deepcopy(game_state[3])
 
         if len(history) == 2 * self.handsize + 2:
             terminal = True
@@ -112,16 +111,16 @@ class Game:
             next_active_player = game_state[0]
         
         if len(history) > 2 and len(history) % 2 == 0:
-            self.wins[next_active_player] += 1
+            player_wins[next_active_player] += 1
 
-        return (next_active_player, next_hands, history, terminal, game_state[4])
+        return (next_active_player, next_hands, history, player_wins, terminal, game_state[5])
     
     def get_payoff(self, game_state):
         """Function to determine the payoff of a game for a given player."""
         p_bets = game_state[2][game_state[0]]
-        p_wins = self.wins[game_state[0]]
+        p_wins = game_state[3][game_state[0]]
         o_bets = game_state[2][(game_state[0] + 1) % 2]
-        o_wins = self.wins[(game_state[0] + 1) % 2]
+        o_wins = game_state[3][(game_state[0] + 1) % 2]
 
         if p_bets == p_wins and o_bets == o_wins:
             return p_wins - o_wins

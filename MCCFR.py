@@ -39,19 +39,19 @@ class MCCFR:
         """Recursive function for chance sampled MCCFR."""
 
         # Base case
-        if game_state[3]:
+        if game_state[4]:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
         counterfactual_values = np.zeros(len(possible_actions))
-        payoff = -1
+        return_value = -1
 
         # If only 1 possible action, no strategy required.
         if len(possible_actions) == 1:
             next_game_state = self.game.get_next_game_state(game_state, possible_actions[0])
             if game_state[0] == next_game_state[0]:
-                payoff = 1
-            node_value = payoff * self.chance_cfr(next_game_state, reach_probs)
+                return_value = 1
+            node_value = return_value * self.chance_cfr(next_game_state, reach_probs)
 
         else:
             player = game_state[0]
@@ -71,8 +71,8 @@ class MCCFR:
                 # recursively call MCCFR
                 next_game_state = self.game.get_next_game_state(game_state, action)
                 if game_state[0] == next_game_state[0]:
-                    payoff = 1
-                counterfactual_values[ix] = payoff * self.chance_cfr(next_game_state, new_reach_probs)
+                    return_value = 1
+                counterfactual_values[ix] = return_value * self.chance_cfr(next_game_state, new_reach_probs)
 
             # Value of the current game state is counterfactual values weighted by the strategy
             node_value = counterfactual_values.dot(strategy)
@@ -85,23 +85,23 @@ class MCCFR:
         """Recursive function for external sampled MCCFR."""
 
         # Base case
-        if game_state[3]:
+        if game_state[4]:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
         counterfactual_values = np.zeros(len(possible_actions))
-        payoff = -1
+        return_value = -1
 
         # If only 1 possible action, no strategy required.
         if len(possible_actions) == 1:
             next_game_state = self.game.get_next_game_state(game_state, possible_actions[0])
             if game_state[0] == next_game_state[0]:
-                payoff = 1
-            node_value = payoff * self.external_cfr(next_game_state, reach_probs, update_player)
+                return_value = 1
+            node_value = return_value * self.external_cfr(next_game_state, reach_probs, update_player)
 
         else:
             player = game_state[0]
-            opponent = (player + 1) % 2
+            opponent = (game_state[0] + 1) % 2
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
             strategy = infoset.regret_matching()
@@ -118,8 +118,8 @@ class MCCFR:
 
                 next_game_state = self.game.get_next_game_state(game_state, action)
                 if game_state[0] == next_game_state[0]:
-                    payoff = 1
-                node_value = payoff * self.external_cfr(next_game_state, new_reach_probs, update_player)
+                    return_value = 1
+                node_value = return_value * self.external_cfr(next_game_state, new_reach_probs, update_player)
 
             else:
                 infoset.update_strategy_sum(reach_probs[player])
@@ -133,8 +133,8 @@ class MCCFR:
                     # recursively call MCCFR
                     next_game_state = self.game.get_next_game_state(game_state, action)
                     if game_state[0] == next_game_state[0]:
-                        payoff = 1
-                    counterfactual_values[ix] = payoff * self.external_cfr(next_game_state, new_reach_probs, update_player)
+                        return_value = 1
+                    counterfactual_values[ix] = return_value * self.external_cfr(next_game_state, new_reach_probs, update_player)
 
                 # Value of the current game state is counterfactual values weighted by the strategy
                 node_value = counterfactual_values.dot(strategy)
@@ -172,19 +172,19 @@ class MCCFR:
         """Function which recursively finds the expected utility."""
 
         # Base case
-        if game_state[3]:
+        if game_state[4]:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
         partial_values = np.zeros(len(possible_actions))
-        payoff = -1
+        return_value = -1
 
         # If only 1 possible action, no strategy required.
         if len(possible_actions) == 1:
             next_game_state = self.game.get_next_game_state(game_state, possible_actions[0])
             if game_state[0] == next_game_state[0]:
-                payoff = 1
-            node_value = payoff * self.evaluate_helper(next_game_state, reach_prob)
+                return_value = 1
+            node_value = return_value * self.evaluate_helper(next_game_state, reach_prob)
 
         else:
             info_key = self.get_info_key(game_state)
@@ -201,8 +201,8 @@ class MCCFR:
                 # recursively call evaluate function
                 next_game_state = self.game.get_next_game_state(game_state, action)
                 if game_state[0] == next_game_state[0]:
-                    payoff = 1
-                partial_values[ix] = payoff * self.evaluate_helper(next_game_state, new_reach_prob)
+                    return_value = 1
+                partial_values[ix] = return_value * self.evaluate_helper(next_game_state, new_reach_prob)
 
             # Value of the current game state is counterfactual values weighted by the strategy
             node_value = partial_values.dot(strategy)
@@ -273,7 +273,7 @@ class MCCFR:
         print('')
         print(f"The history is {game_state[2]}")
         print('')
-        while not game_state[3]:
+        while not game_state[4]:
             possible_actions = self.game.get_possible_actions(game_state)
             if game_state[0] == first_player:
                 while True:
@@ -318,9 +318,9 @@ class MCCFR:
                 print('')
 
         p_bets = game_state[2][first_player]
-        p_wins = self.game.wins[first_player]
+        p_wins = game_state[3][first_player]
         o_bets = game_state[2][(first_player + 1) % 2]
-        o_wins = self.game.wins[(first_player + 1) % 2]
+        o_wins = game_state[3][(first_player + 1) % 2]
         if p_bets == p_wins and o_bets == o_wins:
             return [10 + 2*p_bets, 10 + 2*o_bets]
         elif p_bets == p_wins:

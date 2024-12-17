@@ -6,10 +6,10 @@ import argparse
 
 # Default parameters
 suits = 2
-ranks = 2
-hand_size = 1
+ranks = 3
+hand_size = 2
 starting_iterations = 0
-train_iterations = 10000
+train_iterations = 5000
 intervals = 400
 eval_iterations = 2500
 run_name = 'SmolTest1'

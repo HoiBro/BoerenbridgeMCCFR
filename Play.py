@@ -22,8 +22,8 @@ class Play:
         suit dict, after which the abstraction function is used for further abstraction."""
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
-        new_hand, new_hist = self.game.translate_suits(game_state)
-        abs_hand, abs_trump, abs_hist = self.abstraction_functions[player](new_hand, game_state[1][2], new_hist, possible_action, self.game.mean)
+        new_hand, new_trump, new_hist = self.game.translate_suits(game_state)
+        abs_hand, abs_trump, abs_hist = self.abstraction_functions[player](new_hand, new_trump, new_hist, possible_action, self.game.mean)
         key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, possible_action_len)
         return key
 
@@ -31,7 +31,7 @@ class Play:
         """Recursive function for playing a round by sampling from the given infodicts.
         first_player: info_dicts index for starting player"""
         game_state = self.game.sample_new_game()
-        while not game_state[3]:
+        while not game_state[4]:
             possible_actions = self.game.get_possible_actions(game_state)
             if len(possible_actions) == 1:
                 game_state = self.game.get_next_game_state(game_state, possible_actions[0])
@@ -46,9 +46,9 @@ class Play:
                 game_state = self.game.get_next_game_state(game_state, action)
 
         p_bets = game_state[2][first_player]
-        p_wins = self.game.wins[first_player]
+        p_wins = game_state[3][first_player]
         o_bets = game_state[2][(first_player + 1) % 2]
-        o_wins = self.game.wins[(first_player + 1) % 2]
+        o_wins = game_state[3][(first_player + 1) % 2]
         if p_bets == p_wins and o_bets == o_wins:
             return [10 + 2*p_bets, 10 + 2*o_bets]
         elif p_bets == p_wins:

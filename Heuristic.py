@@ -48,7 +48,7 @@ class Heuristic:
 
     def heuristic(self, game_state):
         """Recursive function which updates the infosets. Use this function to define your heuristic strat"""
-        if game_state[3]:
+        if game_state[4]:
             return self.game.get_payoff(game_state)
         possible_actions = self.game.get_possible_actions(game_state)
 
