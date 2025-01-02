@@ -3,7 +3,7 @@ import random
 
 
 class Play:
-    """Class to simulate games of toepen."""
+    """Class to simulate games of Boerenbridge."""
 
     def __init__(self, game, infoset_data_1, infoset_data_2):
         """Initialize a game, two dictionary containing the strategy profiles and abstraction functions."""

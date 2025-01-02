@@ -31,8 +31,8 @@ class MCCFR:
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
         new_hand, new_trump, new_hist = self.game.translate_suits(game_state)
-        abs_hand, abs_trump, abs_hist = self.abstraction_function(new_hand, new_trump, new_hist, possible_action, self.game.mean)
-        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, possible_action_len)
+        abs_hand, abs_trump, abs_hist, abs_wins = self.abstraction_function(new_hand, new_trump, new_hist, game_state[3], possible_action, self.game.mean)
+        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, abs_wins, possible_action_len)
         return key
 
     def chance_cfr(self, game_state, reach_probs):
@@ -142,6 +142,26 @@ class MCCFR:
                 for ix, action in enumerate(possible_actions):
                     infoset.cumulative_regrets[ix] += reach_probs[opponent] * (counterfactual_values[ix] - node_value)
         return node_value
+    
+    def train_cfr(self, num_iterations):
+        """Train vanilla cfr by calling chance mccfr at every chance node."""
+        util = 0
+        games = 0
+        for _ in range(num_iterations):
+            for trump in self.game.deck.ranks:
+                self.game.deck.reset_deck()
+                self.game.deck.deck1.remove((self.game.deck.suit[0], trump))
+                for dealt_cards in itertools.combinations(self.game.deck.deck1, self.game.handsize * 2):
+                    for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
+                        hand2 = list(card for card in dealt_cards if card not in hand1)
+                    
+                        hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
+                        game_state = self.game.sample_new_game(hands=hands)
+
+                        reach_prob = np.ones(2)
+                        games += 1
+                        util += self.chance_cfr(game_state, reach_prob)
+        return util / num_iterations * games
 
     def train_chance(self, num_iterations):
         """Train chance mccfr by calling the recursive function, iteration number of times."""
@@ -189,7 +209,7 @@ class MCCFR:
         else:
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
-            strategy = infoset.get_average_strategy()
+            strategy = infoset.regret_matching()
 
             for ix, action in enumerate(possible_actions):
                 action_prob = strategy[ix]
@@ -305,7 +325,7 @@ class MCCFR:
                 else:
                     info_key = self.get_info_key(game_state)
                     infoset = self.get_infoset(info_key)
-                    strategy = infoset.get_average_strategy()
+                    strategy = infoset.regret_matching()
                     action = random.choices(possible_actions, strategy)[0]
                     if verbose:
                         print(f"Your opponent had the following possible actions: {possible_actions} with the "

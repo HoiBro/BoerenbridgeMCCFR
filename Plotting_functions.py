@@ -29,19 +29,19 @@ def exploit_plotter(suits, ranks, hand_size, starting_iterations, train_iteratio
             result.append(mccfr.get_exploitability(eval_iterations))
         results.append(result)
         if name != '':
-            mccfr.save_dict(name + str(i))
+            mccfr.save_dict(name + "_" + str(i))
     results = np.array(results)
     mean = np.mean(results, axis=0)
     std = np.std(results, axis=0)
     n_plot = np.linspace(0, train_iterations, intervals+1)
-    plt.fill_between(n_plot, mean + std, mean - std, alpha=0.1, color='r', label='Standard deviation')
+    plt.fill_between(n_plot, mean + std, mean - std, alpha=0.1, color='r', label='Standaard afwijking')
     plt.plot(n_plot, mean, label='Mean', color='r')
     plt.legend()
-    plt.title(f"Exploitability for game")
-    plt.xlabel('Iterations')
-    plt.ylabel('Exploitability')
-    os.makedirs(os.path.dirname(f"Plots/Toepen_exploit_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
-    plt.savefig(f"Plots/Toepen_exploit_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}")
+    plt.title(f"Exploiteerbaarheid for game")
+    plt.xlabel('Iteraties')
+    plt.ylabel('Exploiteerbaarheid')
+    os.makedirs(os.path.dirname(f"Plots/Boerenbridge_exploit_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
+    plt.savefig(f"Plots/Boerenbridge_exploit_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}")
     plt.show()
 
 
@@ -91,12 +91,12 @@ def abstraction_plotter(suits, ranks, hand_size, starting_iterations, train_iter
     plt.plot(n_plot, score_mean, label='s_mean', color='g')
     plt.plot(n_plot, results_mean, label='r_mean', color='r')
     plt.legend()
-    plt.title(f"Average score versus non-abstracted strategy")
-    plt.xlabel('Iterations')
-    plt.ylabel('Average score')
-    os.makedirs(os.path.dirname(f"Plots/abstraction/Toepen_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_ " +
+    plt.title(f"Gemiddelde score tegen niet abstracte strategie")
+    plt.xlabel('Iteraties')
+    plt.ylabel('Gemiddelde score')
+    os.makedirs(os.path.dirname(f"Plots/abstraction/Boerenbridge_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_ " +
                                 f"{abstraction=}".split('=')[0] + f"{runs}"), exist_ok=True)
-    plt.savefig(f"Plots/abstraction/Toepen_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_ " +
+    plt.savefig(f"Plots/abstraction/Boerenbridge_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_ " +
                 f"{abstraction=}".split('=')[0] + f"{runs}")
     plt.show()
 
@@ -284,11 +284,11 @@ def full_abstraction_plotter(suits, ranks, hand_size, starting_iterations, train
     plt.plot(n_plot, results_mean_adv, label='result_adv_mean', color='y')
 
     plt.legend()
-    plt.title(f"Average score versus non-abstracted strategy")
-    plt.xlabel('Iterations')
-    plt.ylabel('Average score')
-    os.makedirs(os.path.dirname(f"Plots/abstraction/Toepen_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
-    plt.savefig(f"Plots/abstraction/Toepen_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}")
+    plt.title(f"Gemiddelde score tegen de niet abstracte strategie")
+    plt.xlabel('Iteraties')
+    plt.ylabel('Gemiddelde score')
+    os.makedirs(os.path.dirname(f"Plots/abstraction/Boerenbridge_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
+    plt.savefig(f"Plots/abstraction/Boerenbridge_abstraction_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}")
     plt.show()
 
     results_normal = np.array(infoset_sizes_normal)
@@ -300,7 +300,7 @@ def full_abstraction_plotter(suits, ranks, hand_size, starting_iterations, train
     n_plot = np.linspace(0, train_iterations, intervals + 1)
     plt.figure(figsize=(8, 6))
 
-    plt.plot(n_plot, np.repeat(infoset_max, intervals + 1), '--', label='Total Infosets', color='m')
+    plt.plot(n_plot, np.repeat(infoset_max, intervals + 1), '--', label='Totaal Informatie Sets', color='m')
 
     mean_normal = np.mean(results_normal, axis=0)
     plt.plot(n_plot, mean_normal, label='Identity', color='c')
@@ -318,9 +318,9 @@ def full_abstraction_plotter(suits, ranks, hand_size, starting_iterations, train
     plt.plot(n_plot, mean_adv, label='Advanced', color='y')
 
     plt.legend()
-    plt.title(f"Average number of information sets reached")
-    plt.xlabel('Iterations')
-    plt.ylabel('Information sets')
-    os.makedirs(os.path.dirname(f"Plots/abstraction/Toepen_abstraction_infosize_{suits}_{ranks}_{hand_size}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
-    plt.savefig(f"Plots/abstraction/Toepen_abstraction_infosize_{suits}_{ranks}_{hand_size}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}")
+    plt.title(f"Gemiddeld aantal informatie sets behaald")
+    plt.xlabel('Iteraties')
+    plt.ylabel('Informatie sets')
+    os.makedirs(os.path.dirname(f"Plots/abstraction/Boerenbridge_abstraction_infosize_{suits}_{ranks}_{hand_size}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
+    plt.savefig(f"Plots/abstraction/Boerenbridge_abstraction_infosize_{suits}_{ranks}_{hand_size}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}")
     plt.show()

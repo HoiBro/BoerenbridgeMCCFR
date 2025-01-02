@@ -5,17 +5,17 @@ import argparse
 """This is the program, used for the MCCFR experiments."""
 
 # Default parameters
-suits = 2
-ranks = 3
+suits = 4
+ranks = 13
 hand_size = 2
 starting_iterations = 0
-train_iterations = 5000
+train_iterations = 100000
 intervals = 400
 eval_iterations = 2500
-run_name = 'SmolTest1'
+run_name = 'ExploitTest'
 FLAGS = None
 
-fast = True
+fast = False
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
 
 if __name__ == '__main__':
     if not fast:
-        wandb.init(project='BoerenbridgeAI', group='Tests', name=run_name)
+        wandb.init(project='BoerenbridgeMCCFR', group='Tests', name=run_name)
         config = wandb.config
 
     # Command line arguments

@@ -1,8 +1,10 @@
 # Boerenbridge
-This repository contains the code for my profielwerkstuk on Boerenbridge.
+Deze GitHub pagina bevat de code voor mijn profielwerkstuk over Boerenbrige.
 
-The file with the main algorithm is MCCFR.py.
+De file met het gebruikte MCCFR algoritme is MCCFR.py.
 
-The dependencies are numpy, tqdm, wandb and for the plotting experiment, matplotlib as well.
+De afhankelijke libraries zijn numpy, tqdm.
 
-To run the experiments, use Mccfr_experiment.py, Abstraction_experiment.py or Plotting_experiment.py.
+Voor het bepalen van waardes heb je voor Mccfr_experiment.py ook nog wandb nodig en voor Plotting_experiment.py matplotlib.
+
+Om het algoritme te laten werken kan je Mccfr_experiment.py, Abstraction_experiment.py of Plotting_experiment.py gebruiken.

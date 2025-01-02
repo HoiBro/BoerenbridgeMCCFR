@@ -1,4 +1,4 @@
-from Abstraction_functions import identity, simple, simple_hand, naive, suit, advanced
+from Abstraction_functions import identity, simple, simple_hand, naive, bets, suit, suitbet, advanced
 from Plotting_functions import exploit_plotter, abstraction_plotter, full_abstraction_plotter
 import argparse
 
@@ -12,9 +12,9 @@ starting_iterations = 0
 train_iterations = 100000
 intervals = 100
 eval_iterations = 10000
-run_name = 'Big100000'
-abstraction = ""
-amount = 1
+run_name = 'SuitTest1'
+abstraction = "suit"
+amount = 5
 FLAGS = None
 
 
@@ -24,7 +24,9 @@ def main():
         "sim": simple,
         "sim_hand": simple_hand,
         "naive": naive,
-        "suit": suit
+        "bets": bets,
+        "suit": suit,
+        "suitbet": suitbet
     }
     if abstraction == '':
         exploit_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
