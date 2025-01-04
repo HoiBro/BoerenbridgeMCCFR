@@ -30,7 +30,7 @@ def exploit(suits, ranks, hand_size, starting_iterations, train_iterations, inte
         mccfr.save_dict(name)
 
 
-def fast_exploit(suits, ranks, hand_size, starting_iterations, train_iterations, intervals, eval_iterations, name):
+def fast(suits, ranks, hand_size, starting_iterations, train_iterations, intervals, eval_iterations, name):
     """Function to generate an infodictionary.
     params:
     train_iterations: total number of iterations
@@ -42,6 +42,20 @@ def fast_exploit(suits, ranks, hand_size, starting_iterations, train_iterations,
     for _ in tqdm([1]):
         mccfr.train_external(train_iterations)
     mccfr.save_dict(name)
+
+
+def fast_abs(suits, ranks, hand_size, starting_iterations, train_iterations, intervals, eval_iterations, name, abstraction):
+    """Function to generate an infodictionary for a given abstraction.
+    params:
+    train_iterations: total number of iterations
+    interval: number of intervals for eval
+    eval_iteration: number of iterations for each eval"""
+    deck = Deck(suits, ranks)
+    game = Game(deck, hand_size)
+    mccfr_abs = MCCFR(game, abstraction)
+    for _ in tqdm([1]):
+        mccfr_abs.train_external(train_iterations)
+    mccfr_abs.save_dict(name)
 
 
 def full_abstraction(suits, ranks, hand_size, starting_iterations, train_iterations, intervals, eval_iterations, name):

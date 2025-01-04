@@ -32,7 +32,7 @@ class MCCFR:
         possible_action_len = len(possible_action)
         new_hand, new_trump, new_hist = self.game.translate_suits(game_state)
         abs_hand, abs_trump, abs_hist, abs_wins = self.abstraction_function(new_hand, new_trump, new_hist, game_state[3], possible_action, self.game.mean)
-        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, abs_wins, possible_action_len)
+        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, abs_wins[0], abs_wins[1], possible_action_len)
         return key
 
     def chance_cfr(self, game_state, reach_probs):

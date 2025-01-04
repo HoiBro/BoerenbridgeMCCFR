@@ -7,4 +7,4 @@ De afhankelijke libraries zijn numpy, tqdm.
 
 Voor het bepalen van waardes heb je voor Mccfr_experiment.py ook nog wandb nodig en voor Plotting_experiment.py matplotlib.
 
-Om het algoritme te laten werken kan je Mccfr_experiment.py, Abstraction_experiment.py of Plotting_experiment.py gebruiken.
+Om het algoritme te laten werken kan je Mccfr_experiment.py of Plotting_experiment.py gebruiken.

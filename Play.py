@@ -23,8 +23,8 @@ class Play:
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
         new_hand, new_trump, new_hist = self.game.translate_suits(game_state)
-        abs_hand, abs_trump, abs_hist = self.abstraction_functions[player](new_hand, new_trump, new_hist, possible_action, self.game.mean)
-        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, possible_action_len)
+        abs_hand, abs_trump, abs_hist, abs_wins = self.abstraction_functions[player](new_hand, new_trump, new_hist, game_state[3], possible_action, self.game.mean)
+        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, abs_wins[0], abs_wins[1], possible_action_len)
         return key
 
     def play_round(self, first_player):

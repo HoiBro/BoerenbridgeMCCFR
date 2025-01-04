@@ -1,8 +1,9 @@
+from Abstraction_functions import identity, simple, simple_hand, naive, bets, suit, suitbet, advanced
 import wandb
-from Experiment_functions import full_abstraction, abstraction_func, exploit, fast_exploit
+from Experiment_functions import full_abstraction, abstraction_func, exploit, fast, fast_abs
 import argparse
 
-"""This is the program, used for the MCCFR experiments."""
+"""This is the program used for the MCCFR experiments."""
 
 # Default parameters
 suits = 4
@@ -12,23 +13,42 @@ starting_iterations = 0
 train_iterations = 100000
 intervals = 400
 eval_iterations = 2500
-run_name = 'ExploitTest'
+run_name = 'SuitbetTest'
+abstraction = "suitbet"
 FLAGS = None
 
-fast = False
+speed = True
 
 
 def main():
-    if fast:
-        fast_exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+    abstraction_functions = {
+        "adv": advanced,
+        "sim": simple,
+        "sim_hand": simple_hand,
+        "naive": naive,
+        "bets": bets,
+        "suit": suit,
+        "suitbet": suitbet
+    }
+    if speed and abstraction == "":
+        fast(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                      FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
-    else:
+    elif speed:
+        fast_abs(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
+    elif abstraction == "":
         exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                 FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
+    elif abstraction == "full":
+        full_abstraction(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
+    else:
+        abstraction_func(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations, FLAGS.train_iterations,
+                         FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
 
 
 if __name__ == '__main__':
-    if not fast:
+    if not speed:
         wandb.init(project='BoerenbridgeMCCFR', group='Tests', name=run_name)
         config = wandb.config
 
@@ -50,8 +70,10 @@ if __name__ == '__main__':
                         help='Number of iterations for evaluation')
     parser.add_argument('--run_name', type=str, default=run_name,
                         help='Name for the run/saved infodict')
+    parser.add_argument('--abstraction', type=str, default=abstraction,
+                        help='Abstraction type')
     FLAGS, unparsed = parser.parse_known_args()
-    if not fast:
+    if not speed:
         config.update(FLAGS)
 
     main()

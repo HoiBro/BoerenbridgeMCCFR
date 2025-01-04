@@ -2,19 +2,19 @@ from Abstraction_functions import identity, simple, simple_hand, naive, bets, su
 from Plotting_functions import exploit_plotter, abstraction_plotter, full_abstraction_plotter
 import argparse
 
-"""This is the program, used for the Plotting experiments."""
+"""This is the program used for the Plotting experiments."""
 
 # Default parameters
-suits = 2
-ranks = 3
+suits = 4
+ranks = 13
 hand_size = 2
 starting_iterations = 0
-train_iterations = 100000
+train_iterations = 10000
 intervals = 100
-eval_iterations = 10000
-run_name = 'SuitTest1'
-abstraction = "suit"
-amount = 5
+eval_iterations = 1000
+run_name = 'suitbet1'
+abstraction = "suitbet"
+amount = 1
 FLAGS = None
 
 
