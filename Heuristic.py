@@ -25,15 +25,14 @@ class Heuristic:
         suit dict, after which the abstraction function is used for further abstraction."""
         possible_action = self.game.get_possible_actions(game_state)
         possible_action_len = len(possible_action)
-        new_hand, new_hist = self.game.translate_suits(game_state)
-        abs_hand, abs_trump, abs_hist = self.abstraction_function(new_hand, game_state[1][2], new_hist, possible_action, self.game.mean)
-        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, possible_action_len)
+        new_hand, new_trump, new_hist = self.game.translate_suits(game_state)
+        abs_hand, abs_trump, abs_hist, abs_wins = self.abstraction_function(new_hand, new_trump, new_hist, game_state[3], possible_action, self.game.mean)
+        key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, abs_wins[0], abs_wins[1], possible_action_len)
         return key
 
     def avg_deck(self, game_state):
         """Function which finds the average rank of the deck, without the cards that have been played"""
         deck = self.game.deck.deck2.copy()
-        hand = game_state[1][game_state[0]]
         for action in game_state[2]:
             if not isinstance(action, np.int64):
                 deck.remove(action)
@@ -60,55 +59,49 @@ class Heuristic:
 
             # Define rules using the info_key
             # A passive player who plays highest card if winnable and lowest otherwise
-            if 'Call' in possible_actions:
-                # Rules for calling/folding
+            if self.reacting(game_state) is not False and \
+                    self.reacting(game_state)[0] == possible_actions[0][0] and \
+                    self.reacting(game_state)[1] < max(possible_actions, key=lambda t: t[1])[1]:
+                higher_list = [i for i in possible_actions if i[1] > self.reacting(game_state)[1]]
+                index = possible_actions.index(min(higher_list, key=lambda t: t[1]))
 
-                hand = game_state[1][game_state[0]]
-                if len(hand) == 0:
-                    infoset.heuristic_update(1)
-                else:
-                    avg_deck = self.avg_deck(game_state)
-                    hand_strength = sum(map(lambda x: x[1], hand)) / len(hand)
-                    if avg_deck < hand_strength:
-                        infoset.heuristic_update(1, 1-self.confidence)
-                        infoset.heuristic_update(0, self.confidence)
-                    else:
-                        infoset.heuristic_update(1, self.confidence)
-                        infoset.heuristic_update(0, 1-self.confidence)
+            elif self.reacting(game_state):
+                # Play lowest card and randomize if more than one
+                index = random.choice([i for i, x in enumerate(possible_actions) if
+                                        x[1] == min(possible_actions, key=lambda t: t[1])[1]])
             else:
-                # rules for playing cards
-                if self.reacting(game_state) is not False and \
-                        self.reacting(game_state)[0] == possible_actions[0][0] and \
-                        self.reacting(game_state)[1] < max(possible_actions, key=lambda t: t[1])[1]:
-                    higher_list = [i for i in possible_actions if i[1] > self.reacting(game_state)[1]]
-                    index = possible_actions.index(min(higher_list, key=lambda t: t[1]))
-
-                elif self.reacting(game_state):
-                    # Play lowest card and randomize if more than one
-                    index = random.choice([i for i, x in enumerate(possible_actions) if
-                                           x[1] == min(possible_actions, key=lambda t: t[1])[1]])
-                else:
-                    index = random.choice([i for i, x in enumerate(possible_actions) if
-                                           x[1] == max(possible_actions, key=lambda t: t[1])[1]])
-                infoset.heuristic_update(index)
+                index = random.choice([i for i, x in enumerate(possible_actions) if
+                                        x[1] == max(possible_actions, key=lambda t: t[1])[1]])
+            infoset.heuristic_update(index)
 
             for action in possible_actions:
                 self.heuristic(self.game.get_next_game_state(game_state, action))
 
-    def make_dict(self):
-        """Create the dict for all possible infosets."""
-        for dealt_cards in itertools.combinations(self.game.deck.deck2, self.game.handsize * 2 + 1):
-            for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
-                for trump in list(card for card in dealt_cards if card not in hand1):
-                    hand2 = list(card for card in dealt_cards
-                                 if card not in hand1
-                                 if card not in trump)
-                    hands = [sorted(list(hand1)), sorted(hand2), trump]
-                    game_state = self.game.sample_new_game(hands=hands)
-                    self.heuristic(game_state)
-
     def count_infosets(self):
-        """Count total number of infosets in the dict."""
+        """Count total number of infosets in the infodictionary."""
         p1_count = len([x for x, _ in self.infoset_dict.items() if x[0] == 0])
         p2_count = len(self.infoset_dict.items()) - p1_count
         return p1_count, p2_count
+
+    def dict_helper(self, game_state):
+        """Function which creates an infodictionary for every branching game state from an original game state."""
+        if game_state[4]:
+            return
+        possible_actions = self.game.get_possible_actions(game_state)
+
+        for i in possible_actions:
+            next_game_state = self.game.get_next_game_state(game_state, i)
+            self.dict_helper(next_game_state)
+
+    def make_dict(self):
+        """Create the infodictionary for all possible infosets."""
+        for trump in self.game.deck.ranks:
+            self.game.deck.reset_deck()
+            self.game.deck.deck1.remove((self.game.deck.suit[0], trump))
+            for dealt_cards in itertools.combinations(self.game.deck.deck1, self.game.handsize * 2):
+                for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
+                    hand2 = list(card for card in dealt_cards if card not in hand1)
+                    hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
+                    game_state = self.game.sample_new_game(hands=hands)
+                    self.dict_helper(game_state)
+        self.game.deck.reset_deck()

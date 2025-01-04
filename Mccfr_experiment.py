@@ -19,29 +19,30 @@ FLAGS = None
 
 speed = True
 
+# The abstractions to choose from are naive, simple, simple_hand, bets, suit, suitbet, advanced in that order.
+abstractions = [False, False, False, False, False, False, False]
 
 def main():
     abstraction_functions = {
         "adv": advanced,
+        "bets": bets,
+        "naive": naive,
         "sim": simple,
         "sim_hand": simple_hand,
-        "naive": naive,
-        "bets": bets,
         "suit": suit,
         "suitbet": suitbet
     }
     if speed and abstraction == "":
-        fast(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
-                     FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
+        fast(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations, FLAGS.run_name)
     elif speed:
-        fast_abs(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
-                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
+        fast_abs(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size,
+                 FLAGS.train_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
     elif abstraction == "":
         exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                 FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
     elif abstraction == "full":
-        full_abstraction(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
-                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
+        full_abstraction(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,
+                         FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstractions)
     else:
         abstraction_func(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations, FLAGS.train_iterations,
                          FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     parser.add_argument('--eval_iterations', type=int, default=eval_iterations,
                         help='Number of iterations for evaluation')
     parser.add_argument('--run_name', type=str, default=run_name,
-                        help='Name for the run/saved infodict')
+                        help='Name for the run/saved infodictionary')
     parser.add_argument('--abstraction', type=str, default=abstraction,
                         help='Abstraction type')
     FLAGS, unparsed = parser.parse_known_args()

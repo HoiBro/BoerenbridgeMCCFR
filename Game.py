@@ -14,8 +14,8 @@ class Game:
         self.mean = np.mean(deck.ranks)
 
     def suit_abstraction_dict(self, hand, trump):
-        """Function to create a suit dict for card isomorphism. Each suit is mapped to an abstraction which
-        is specific for the initial hand."""
+        """Function to create a suit dictionary for card isomorphism.
+        Each suit is mapped to an abstraction which is specific for the initial hand."""
         suits = self.deck.suit
         suit_abstraction = ('first', 'second', 'third', 'fourth')
         suit_dict = {}
@@ -37,7 +37,7 @@ class Game:
 
     @staticmethod
     def translate_suits(game_state):
-        """Function which translates all the suits in a game state, based on the suit dict."""
+        """Function which translates all the suits in a game state, based on the suit dictionary."""
         suit_dict = game_state[5][game_state[0]]
         hand = game_state[1][game_state[0]]
         trump = game_state[1][2]
@@ -59,7 +59,7 @@ class Game:
         """Function to sample an initial game state with an empty history. Optionality to provide hands instead of
         uniformly sampling a hand. Game state has form:
         (active_player, cards, history, player_wins, terminal, suit_dicts) where,
-        active_player = 0 or 1 for player 0 or 1.
+        active_player = 0 or 1 for player 0 or 1
         cards = a list of 2 lists and one trump, one list for each player, the lists contain cards which are tuples of the form: (suit, rank)
         history = tuple containing all actions in order
         player_wins = the amount of wins both players have gotten

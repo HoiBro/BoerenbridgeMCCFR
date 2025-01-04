@@ -4,6 +4,11 @@ def identity(hand, trump, hist, wins, pos, mean):
     return hand, trump, hist, wins
 
 
+def naive(hand, trump, hist, wins, pos, mean):
+    """Least possible states"""
+    return [], (), (), [0, 0]
+
+
 def simple(hand, trump, hist, wins, pos, mean):
     """Abstract away the entire history"""
     return hand, trump, (), wins
@@ -12,11 +17,6 @@ def simple(hand, trump, hist, wins, pos, mean):
 def simple_hand(hand, trump, hist, wins, pos, mean):
     """Abstract away the entire hand"""
     return [], trump, hist, wins
-
-
-def naive(hand, trump, hist, wins, pos, mean):
-    """Least possible states"""
-    return [], (), (), []
 
 
 def bets(hand, trump, hist, wins, pos, mean):

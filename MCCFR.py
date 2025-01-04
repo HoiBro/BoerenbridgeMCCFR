@@ -161,6 +161,7 @@ class MCCFR:
                         reach_prob = np.ones(2)
                         games += 1
                         util += self.chance_cfr(game_state, reach_prob)
+        self.game.deck.reset_deck()
         return util / num_iterations * games
 
     def train_chance(self, num_iterations):
@@ -183,7 +184,7 @@ class MCCFR:
         return util / (num_iterations * 2)
 
     def count_infosets(self):
-        """Function which counts the number of information sets in the dict"""
+        """Function which counts the number of information sets in the infodictionary"""
         p1_count = len([x for x, _ in self.infoset_dict.items() if x[0] == 0])
         p2_count = len(self.infoset_dict.items()) - p1_count
         return p1_count, p2_count
@@ -229,7 +230,7 @@ class MCCFR:
         return node_value
 
     def evaluate(self):
-        """Evaluates the current infodict by multiplying the probabilities of the
+        """Evaluates the current infodictionary by multiplying the probabilities of the
         terminal nodes with the utilities of those nodes"""
         hand_prob = (len(self.game.deck.deck2) *
                      math.comb(len(self.game.deck.deck2) - 1, self.game.handsize) *
@@ -247,6 +248,7 @@ class MCCFR:
 
                     reach_prob = 1
                     util += self.evaluate_helper(game_state, reach_prob)
+        self.game.deck.reset_deck()
         return len(self.game.deck.suit) * util / hand_prob
 
     def get_exploitability(self, num_iterations):
@@ -266,9 +268,32 @@ class MCCFR:
         b_2 = self.evaluate()
         self.infoset_dict = deepcopy(info_dict_copy)
         return b_1 - b_2
+    
+    def dict_helper(self, game_state):
+        """Function which creates an infodictionary for every branching game state from an original game state."""
+        if game_state[4]:
+            return
+        possible_actions = self.game.get_possible_actions(game_state)
+
+        for i in possible_actions:
+            next_game_state = self.game.get_next_game_state(game_state, i)
+            self.dict_helper(next_game_state)
+
+    def make_dict(self):
+        """Create the infodictionary for all possible infosets."""
+        for trump in self.game.deck.ranks:
+            self.game.deck.reset_deck()
+            self.game.deck.deck1.remove((self.game.deck.suit[0], trump))
+            for dealt_cards in itertools.combinations(self.game.deck.deck1, self.game.handsize * 2):
+                for hand1 in itertools.combinations(dealt_cards, self.game.handsize):
+                    hand2 = list(card for card in dealt_cards if card not in hand1)
+                    hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
+                    game_state = self.game.sample_new_game(hands=hands)
+                    self.dict_helper(game_state)
+        self.game.deck.reset_deck()
 
     def save_dict(self, name):
-        """Save information dict as pickle."""
+        """Save information dictionary as pickle."""
         filename = f"Dicts/{name}.pkl"
         os.makedirs(os.path.dirname(filename), exist_ok=True)
         a_file = open(filename, "wb")
@@ -276,14 +301,31 @@ class MCCFR:
         a_file.close()
 
     def load_dict(self, name):
-        """Load information dict as pickle."""
+        """Load information dictionary as pickle."""
         a_file = open(f"Dicts/{name}.pkl", "rb")
         output = pickle.load(a_file)
         self.infoset_dict = output
         self.infoset_data = (self.infoset_dict, self.abstraction_function)
+    
+    def complexity_pos(self):
+        """Find the upper bound of the number of possible histories"""
+        suits = len(self.game.deck.suit)
+        ranks = len(self.game.deck.ranks)
+        com = math.comb(suits*ranks, self.game.handsize)*math.comb((suits*ranks)-self.game.handsize, self.game.handsize)
+        for i in range(self.game.handsize):
+            com *= (i+1)**2
+
+    def complexity_info(self):
+        """Find the upper bound of the number of possible information sets."""
+        suits = len(self.game.deck.suit)
+        ranks = len(self.game.deck.ranks)
+        com = math.comb(suits*ranks, self.game.handsize)
+        for i in range(1, self.game.handsize):
+            com *= (suits*ranks) - (self.game.handsize+i-1)
+            com *= (i+1)
 
     def play_round(self, first_player, verbose):
-        """Recursive function for playing a round by sampling from the given infodict. And allowing the input to play.
+        """Recursive function for playing a round by sampling from the given infodictionary. And allowing the input to play.
         first_player: info_dicts index for starting player"""
         game_state = self.game.sample_new_game()
         if verbose:
