@@ -41,8 +41,8 @@ def main():
         exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                 FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)
     elif abstraction == "full":
-        full_abstraction(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,
-                         FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstractions)
+        full_abstraction(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                         FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstractions)
     else:
         abstraction_func(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations, FLAGS.train_iterations,
                          FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
