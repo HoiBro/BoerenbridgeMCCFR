@@ -45,6 +45,7 @@ class Play:
                 action = random.choices(possible_actions, strategy)[0]
                 game_state = self.game.get_next_game_state(game_state, action)
 
+        # Determine the payoffs
         p_bets = game_state[2][first_player]
         p_wins = game_state[3][first_player]
         o_bets = game_state[2][(first_player + 1) % 2]
@@ -59,7 +60,7 @@ class Play:
             return [-2*abs(p_bets - p_wins), -2*abs(o_bets - o_wins)]
 
     def play_n_rounds(self, iterations):
-        """Play iterations, number of rounds and return the average score."""
+        """Play iterations, number of rounds and return the average score and total score."""
         player_payoff = 0
         total_payoff = 0
         for _ in range(iterations):

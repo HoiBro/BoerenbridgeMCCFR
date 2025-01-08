@@ -104,4 +104,3 @@ class Heuristic:
                     hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
                     game_state = self.game.sample_new_game(hands=hands)
                     self.dict_helper(game_state)
-        self.game.deck.reset_deck()

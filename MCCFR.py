@@ -68,7 +68,7 @@ class MCCFR:
                 new_reach_probs = reach_probs.copy()
                 new_reach_probs[player] *= action_prob
 
-                # recursively call MCCFR
+                # Recursively call MCCFR
                 next_game_state = self.game.get_next_game_state(game_state, action)
                 if game_state[0] == next_game_state[0]:
                     return_value = 1
@@ -112,7 +112,7 @@ class MCCFR:
                 action_index = list(possible_actions).index(action)
                 action_prob = strategy[action_index]
 
-                # compute new reach probabilities after this action
+                # Compute new reach probabilities after this action
                 new_reach_probs = reach_probs.copy()
                 new_reach_probs[player] *= action_prob
 
@@ -126,11 +126,11 @@ class MCCFR:
                 for ix, action in enumerate(possible_actions):
                     action_prob = strategy[ix]
 
-                    # compute new reach probabilities after this action
+                    # Compute new reach probabilities after this action
                     new_reach_probs = reach_probs.copy()
                     new_reach_probs[player] *= action_prob
 
-                    # recursively call MCCFR
+                    # Recursively call MCCFR
                     next_game_state = self.game.get_next_game_state(game_state, action)
                     if game_state[0] == next_game_state[0]:
                         return_value = 1
@@ -161,7 +161,6 @@ class MCCFR:
                         reach_prob = np.ones(2)
                         games += 1
                         util += self.chance_cfr(game_state, reach_prob)
-        self.game.deck.reset_deck()
         return util / num_iterations * games
 
     def train_chance(self, num_iterations):
@@ -210,16 +209,16 @@ class MCCFR:
         else:
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
-            strategy = infoset.regret_matching()
+            strategy = infoset.get_average_strategy()
 
             for ix, action in enumerate(possible_actions):
                 action_prob = strategy[ix]
 
-                # compute new reach probabilities after this action
+                # Compute new reach probabilities after this action
                 new_reach_prob = reach_prob
                 new_reach_prob *= action_prob
 
-                # recursively call evaluate function
+                # Recursively call evaluate function
                 next_game_state = self.game.get_next_game_state(game_state, action)
                 if game_state[0] == next_game_state[0]:
                     return_value = 1
@@ -248,7 +247,6 @@ class MCCFR:
 
                     reach_prob = 1
                     util += self.evaluate_helper(game_state, reach_prob)
-        self.game.deck.reset_deck()
         return len(self.game.deck.suit) * util / hand_prob
 
     def get_exploitability(self, num_iterations):
@@ -290,7 +288,6 @@ class MCCFR:
                     hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
                     game_state = self.game.sample_new_game(hands=hands)
                     self.dict_helper(game_state)
-        self.game.deck.reset_deck()
 
     def save_dict(self, name):
         """Save information dictionary as pickle."""
@@ -308,12 +305,13 @@ class MCCFR:
         self.infoset_data = (self.infoset_dict, self.abstraction_function)
     
     def complexity_pos(self):
-        """Find the upper bound of the number of possible histories"""
+        """Find the upper bound of the number of possible histories,
+        this does not yet include the possibility for player cards having matching suits."""
         suits = len(self.game.deck.suit)
         ranks = len(self.game.deck.ranks)
-        com = math.comb(suits*ranks, self.game.handsize)*math.comb((suits*ranks)-self.game.handsize, self.game.handsize)
+        card_combinations = math.comb(suits*ranks, 2*self.game.handsize)*math.comb(2*self.game.handsize, self.game.handsize)*(suits*ranks - 2*self.game.handsize)
         for i in range(self.game.handsize):
-            com *= (i+1)**2
+            card_combinations *= (i+1)**2
 
     def complexity_info(self):
         """Find the upper bound of the number of possible information sets."""
@@ -367,7 +365,7 @@ class MCCFR:
                 else:
                     info_key = self.get_info_key(game_state)
                     infoset = self.get_infoset(info_key)
-                    strategy = infoset.regret_matching()
+                    strategy = infoset.get_average_strategy()
                     action = random.choices(possible_actions, strategy)[0]
                     if verbose:
                         print(f"Your opponent had the following possible actions: {possible_actions} with the "
@@ -379,6 +377,7 @@ class MCCFR:
                     game_state = self.game.get_next_game_state(game_state, action)
                 print('')
 
+        # Determine the payoffs
         p_bets = game_state[2][first_player]
         p_wins = game_state[3][first_player]
         o_bets = game_state[2][(first_player + 1) % 2]

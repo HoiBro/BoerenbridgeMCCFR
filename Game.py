@@ -15,7 +15,8 @@ class Game:
 
     def suit_abstraction_dict(self, hand, trump):
         """Function to create a suit dictionary for card isomorphism.
-        Each suit is mapped to an abstraction which is specific for the initial hand."""
+        Each suit is mapped to an abstraction which is specific for the initial hand.
+        "fourth" is the highest valued suit and "first" is the lowest."""
         suits = self.deck.suit
         suit_abstraction = ('first', 'second', 'third', 'fourth')
         suit_dict = {}
@@ -79,6 +80,7 @@ class Game:
         """Function which uses a game state to determine the possible actions as a list from this game state."""
         cards = sorted(game_state[1][game_state[0]])
 
+        # If betting
         if len(game_state[2]) < 2:
             return np.arange(self.handsize + 1)
         elif len(game_state[2]) % 2 == 0:

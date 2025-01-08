@@ -18,6 +18,7 @@ amount = 1
 score = False
 FLAGS = None
 
+# These are the abstractions for the "full" abstraction.
 # The abstractions to choose from are naive, simple, simple_hand, bets, suit, suitbet, advanced in that order.
 abstractions = [False, False, False, False, False, False, False]
 

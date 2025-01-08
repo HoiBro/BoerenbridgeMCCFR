@@ -6,7 +6,7 @@ from Abstraction_functions import identity, simple, simple_hand, naive, bets, su
 from Play import Play
 import wandb
 
-#Just as a warning, this code is an absolute mess and I could've probably done this WAY better using string manipulation and a for loop but ah well, it is what it is now (I'm sorry :/).
+# Just as a warning, this code is an absolute mess and I could've probably done this WAY better using string manipulation and a for loop but ah well, it is what it is now (I'm sorry :/).
 
 def exploit(suits, ranks, hand_size, starting_iterations, train_iterations, intervals, eval_iterations, name):
     """Function to run the MCCFR experiment."""
