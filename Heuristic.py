@@ -89,8 +89,12 @@ class Heuristic:
             return
         possible_actions = self.game.get_possible_actions(game_state)
 
-        for i in possible_actions:
-            next_game_state = self.game.get_next_game_state(game_state, i)
+        if len(possible_actions) != 1:
+            info_key = self.get_info_key(game_state)
+            self.get_infoset(info_key)
+
+        for action in possible_actions:
+            next_game_state = self.game.get_next_game_state(game_state, action)
             self.dict_helper(next_game_state)
 
     def make_dict(self):

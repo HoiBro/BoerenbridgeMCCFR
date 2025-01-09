@@ -273,8 +273,12 @@ class MCCFR:
             return
         possible_actions = self.game.get_possible_actions(game_state)
 
-        for i in possible_actions:
-            next_game_state = self.game.get_next_game_state(game_state, i)
+        if len(possible_actions) != 1:
+            info_key = self.get_info_key(game_state)
+            self.get_infoset(info_key)
+
+        for action in possible_actions:
+            next_game_state = self.game.get_next_game_state(game_state, action)
             self.dict_helper(next_game_state)
 
     def make_dict(self):
@@ -309,18 +313,23 @@ class MCCFR:
         this does not yet include the possibility for player cards having matching suits."""
         suits = len(self.game.deck.suit)
         ranks = len(self.game.deck.ranks)
-        card_combinations = math.comb(suits*ranks, 2*self.game.handsize)*math.comb(2*self.game.handsize, self.game.handsize)*(suits*ranks - 2*self.game.handsize)
+        complexity = math.comb(suits*ranks, 2*self.game.handsize)*math.comb(2*self.game.handsize, self.game.handsize)*(suits*ranks - 2*self.game.handsize)
+        complexity *= (self.game.handsize + 1)**2
         for i in range(self.game.handsize):
-            card_combinations *= (i+1)**2
+            complexity *= (i+1)**2
+        return complexity
 
     def complexity_info(self):
-        """Find the upper bound of the number of possible information sets."""
+        """Find the upper bound of the number of possible information sets,
+        this does not yet include the possibility for player cards having matching suits."""
         suits = len(self.game.deck.suit)
         ranks = len(self.game.deck.ranks)
-        com = math.comb(suits*ranks, self.game.handsize)
+        complexity = math.comb(suits*ranks, self.game.handsize)*(suits*ranks - self.game.handsize)
+        complexity *= (self.game.handsize + 1)**2
         for i in range(1, self.game.handsize):
-            com *= (suits*ranks) - (self.game.handsize+i-1)
-            com *= (i+1)
+            complexity *= (suits*ranks) - (self.game.handsize+i)
+            complexity *= (i+1)
+        return complexity
 
     def play_round(self, first_player, verbose):
         """Recursive function for playing a round by sampling from the given infodictionary. And allowing the input to play.

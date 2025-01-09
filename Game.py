@@ -87,7 +87,7 @@ class Game:
             return cards
         else:
             # Players have to play the same suit, unless they can not.
-            possible = [i for i in cards if i[0] == game_state[2][-1][0]]
+            possible = [card for card in cards if card[0] == game_state[2][-1][0]]
             if len(possible) == 0:
                 return cards
             else:
