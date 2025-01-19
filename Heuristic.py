@@ -30,25 +30,22 @@ class Heuristic:
         key = (game_state[0], frozenset(abs_hand), abs_trump, abs_hist, abs_wins[0], abs_wins[1], possible_action_len)
         return key
 
-    def avg_deck(self, game_state):
-        """Function which finds the average rank of the deck, without the cards that have been played"""
-        deck = self.game.deck.deck2.copy()
-        for action in game_state[2]:
-            if not isinstance(action, np.int64):
-                deck.remove(action)
-        return sum(map(lambda x: x[1], deck)) / len(deck)
-
     def reacting(self, game_state):
-        """return False if first player of round and first card if not"""
+        """Returns false if first player of round and last played card in the history if not"""
         if len(game_state[2]) % 2 == 0:
             return False
-        else:
+        elif len(game_state[2]) > 1:
             return game_state[2][-1]
+        else:
+            return False
 
     def heuristic(self, game_state):
         """Recursive function which updates the infosets. Use this function to define your heuristic strat"""
+
+        # Base case
         if game_state[4]:
             return self.game.get_payoff(game_state)
+        
         possible_actions = self.game.get_possible_actions(game_state)
 
         if len(possible_actions) == 1:
@@ -56,16 +53,31 @@ class Heuristic:
         else:
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
+            react = self.reacting(game_state)
 
             # Define rules using the info_key
             # A passive player who plays highest card if winnable and lowest otherwise
-            if self.reacting(game_state) is not False and \
-                    self.reacting(game_state)[0] == possible_actions[0][0] and \
-                    self.reacting(game_state)[1] < max(possible_actions, key=lambda t: t[1])[1]:
-                higher_list = [i for i in possible_actions if i[1] > self.reacting(game_state)[1]]
-                index = possible_actions.index(min(higher_list, key=lambda t: t[1]))
+            if len(game_state[2]) < 2:
+                hand = game_state[1][game_state[0]]
+                deck = self.game.deck.deck2.copy()
+                for card in hand:
+                    deck.remove(card)
+                deck.remove(game_state[1][2])
+                hand_strength = sum(map(lambda x: x[1], hand)) / len(hand)
+                deck_strength = sum(map(lambda x: x[1], deck)) / len(deck)
+                compared_hand_strength = hand_strength - deck_strength
 
-            elif self.reacting(game_state):
+                ranks = len(self.game.deck.ranks)
+                
+                if compared_hand_strength > 0:
+                    index
+                index = possible_actions.index(max(possible_actions, key=lambda t: t[1]))
+            elif react is not False and \
+                    react[0] == possible_actions[0][0] and \
+                    react[1] < max(possible_actions, key=lambda t: t[1])[1]:
+                higher_list = [card for card in possible_actions if card[1] > react[1]]
+                index = possible_actions.index(min(higher_list, key=lambda t: t[1]))
+            elif react:
                 # Play lowest card and randomize if more than one
                 index = random.choice([i for i, x in enumerate(possible_actions) if
                                         x[1] == min(possible_actions, key=lambda t: t[1])[1]])
@@ -94,8 +106,7 @@ class Heuristic:
             self.get_infoset(info_key)
 
         for action in possible_actions:
-            next_game_state = self.game.get_next_game_state(game_state, action)
-            self.dict_helper(next_game_state)
+            self.dict_helper(self.game.get_next_game_state(game_state, action))
 
     def make_dict(self):
         """Create the infodictionary for all possible infosets."""

@@ -278,8 +278,7 @@ class MCCFR:
             self.get_infoset(info_key)
 
         for action in possible_actions:
-            next_game_state = self.game.get_next_game_state(game_state, action)
-            self.dict_helper(next_game_state)
+            self.dict_helper(self.game.get_next_game_state(game_state, action))
 
     def make_dict(self):
         """Create the infodictionary for all possible infosets."""
