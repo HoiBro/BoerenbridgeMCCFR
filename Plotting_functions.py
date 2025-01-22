@@ -36,13 +36,21 @@ def exploit_plotter(suits, ranks, hand_size, starting_iterations, train_iteratio
     mean = np.mean(results, axis=0)
     std = np.std(results, axis=0)
     if name != '':
-        filename = f"Dicts/{name}_results.pkl"
-        os.makedirs(os.path.dirname(filename), exist_ok=True)
-        a_file = open(filename, "wb")
+        filename1 = f"Dicts/{name}_results.pkl"
+        filename2 = f"Dicts/{name}_mean.pkl"
+        filename3 = f"Dicts/{name}_std.pkl"
+        os.makedirs(os.path.dirname(filename1), exist_ok=True)
+        os.makedirs(os.path.dirname(filename2), exist_ok=True)
+        os.makedirs(os.path.dirname(filename3), exist_ok=True)
+        a_file = open(filename1, "wb")
         pickle.dump(results, a_file)
-        pickle.dump(mean, a_file)
-        pickle.dump(std, a_file)
         a_file.close()
+        b_file = open(filename2, "wb")
+        pickle.dump(mean, b_file)
+        b_file.close()
+        c_file = open(filename3, "wb")
+        pickle.dump(std, c_file)
+        c_file.close()
     n_plot = np.linspace(starting_iterations, train_iterations+starting_iterations, intervals+1)
     plt.fill_between(n_plot, mean + std, mean - std, alpha=0.1, color='r', label='Standaard afwijking')
     plt.plot(n_plot, mean, label='Mean', color='r')
