@@ -269,10 +269,11 @@ class MCCFR:
     
     def dict_helper(self, game_state):
         """Function which creates an infodictionary for every branching game state from an original game state."""
-        i = 1
+        i = 0
         if game_state[4]:
             return i
         possible_actions = self.game.get_possible_actions(game_state)
+        i = 1
 
         if len(possible_actions) != 1:
             info_key = self.get_info_key(game_state)
@@ -324,15 +325,29 @@ class MCCFR:
 
     def complexity_info(self):
         """Find the upper bound of the number of possible information sets,
-        this does not however include the possibility for player cards having matching suits."""
+        this does not however include the possibility for player cards having matching suits
+        and assumes that the first cards that are dealt are a different suit than the other cards."""
         suits = len(self.game.deck.suit)
         ranks = len(self.game.deck.ranks)
-        complexity = suits*math.comb((suits*ranks/2)-1, self.game.handsize)
-        complexity *= (self.game.handsize + 2)
-        for i in range(1, self.game.handsize):
-            complexity *= (suits*ranks) - (self.game.handsize+i)
-            complexity *= (i+1)
-        return complexity
+        complexity1 = 1
+        for i in range(self.game.handsize+1):
+            j = i + 1
+            if j > suits:
+                j = suits
+            complexity1 *= j*ranks-i
+        complexity2 = complexity1
+
+        complexity1 += complexity1*(self.game.handsize+1)
+        complexity2 += complexity2*(self.game.handsize+1)*((suits*ranks)-self.game.handsize-1)
+
+        for i in range(self.game.handsize-2):
+            complexity1 += complexity1*((self.game.handsize-i)*((suits*ranks)-self.game.handsize-1-i))
+            complexity2 += complexity2*((self.game.handsize-i)*((suits*ranks)-self.game.handsize-2-i))
+
+        for i in range(suits-2):
+            complexity1 += int(complexity1*(1-ranks/((i+2)*ranks-(i+1))))
+
+        return complexity1, complexity2
 
     def play_round(self, first_player, verbose):
         """Recursive function for playing a round by sampling from the given infodictionary. And allowing the input to play.
