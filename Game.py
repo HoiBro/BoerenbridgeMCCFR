@@ -108,11 +108,10 @@ class Game:
         if not isinstance(action, np.int64):
             next_hands[game_state[0]].remove(action)
 
-        # The same player only plays twice in a row if they win a round as a reacting player.
-        if len(history) > 2 and len(history) % 2 == 0 and (action[0] == game_state[2][-1][0] and game_state[2][-1][1] < action[1] or action[0] == game_state[1][2][0] and game_state[2][-1][0] != game_state[1][2][0]):
-            next_active_player = game_state[0]
-        
         if len(history) > 2 and len(history) % 2 == 0:
+            # The same player only plays twice in a row if they win a round as a reacting player.
+            if action[0] == game_state[2][-1][0] and game_state[2][-1][1] < action[1] or action[0] == game_state[1][2][0] and game_state[2][-1][0] != game_state[1][2][0]:
+                next_active_player = game_state[0]
             player_wins[next_active_player] += 1
 
         return (next_active_player, next_hands, history, player_wins, terminal, game_state[5])

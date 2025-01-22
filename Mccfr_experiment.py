@@ -1,6 +1,6 @@
 from Abstraction_functions import identity, simple, simple_hand, naive, bets, suit, suitbet, advanced
 import wandb
-from Experiment_functions import full_abstraction, abstraction_func, exploit, fast, fast_abs
+from Experiment_functions import full_abstraction, abstraction_func, exploit, fast, retrain
 import argparse
 
 """This is the program used for the MCCFR experiments."""
@@ -17,6 +17,8 @@ run_name = 'SuitbetTest'
 abstraction = "suitbet"
 FLAGS = None
 
+# When the algorithm has no abstraction, choose abstraction = "identity"
+train = False
 speed = True
 
 # These are the abstractions for the "full" abstraction.
@@ -25,6 +27,7 @@ abstractions = [False, False, False, False, False, False, False]
 
 def main():
     abstraction_functions = {
+        "identity": identity,
         "adv": advanced,
         "bets": bets,
         "naive": naive,
@@ -33,11 +36,12 @@ def main():
         "suit": suit,
         "suitbet": suitbet
     }
-    if speed and abstraction == "":
-        fast(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations, FLAGS.run_name)
+    if train:
+        retrain(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,
+                FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
     elif speed:
-        fast_abs(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size,
-                 FLAGS.train_iterations, FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
+        fast(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,
+             FLAGS.run_name, abstraction_functions[FLAGS.abstraction])
     elif abstraction == "":
         exploit(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
                 FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name)

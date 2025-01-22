@@ -89,7 +89,6 @@ class MCCFR:
             return self.game.get_payoff(game_state)
 
         possible_actions = self.game.get_possible_actions(game_state)
-        counterfactual_values = np.zeros(len(possible_actions))
         return_value = -1
 
         # If only 1 possible action, no strategy required.
@@ -101,7 +100,6 @@ class MCCFR:
 
         else:
             player = game_state[0]
-            opponent = (game_state[0] + 1) % 2
             info_key = self.get_info_key(game_state)
             infoset = self.get_infoset(info_key)
             strategy = infoset.regret_matching()
@@ -122,6 +120,8 @@ class MCCFR:
                 node_value = return_value * self.external_cfr(next_game_state, new_reach_probs, update_player)
 
             else:
+                opponent = (game_state[0] + 1) % 2
+                counterfactual_values = np.zeros(len(possible_actions))
                 infoset.update_strategy_sum(reach_probs[player])
                 for ix, action in enumerate(possible_actions):
                     action_prob = strategy[ix]
@@ -269,8 +269,9 @@ class MCCFR:
     
     def dict_helper(self, game_state):
         """Function which creates an infodictionary for every branching game state from an original game state."""
+        i = 1
         if game_state[4]:
-            return
+            return i
         possible_actions = self.game.get_possible_actions(game_state)
 
         if len(possible_actions) != 1:
@@ -278,10 +279,12 @@ class MCCFR:
             self.get_infoset(info_key)
 
         for action in possible_actions:
-            self.dict_helper(self.game.get_next_game_state(game_state, action))
+            i += self.dict_helper(self.game.get_next_game_state(game_state, action))
+        return i
 
     def make_dict(self):
-        """Create the infodictionary for all possible infosets."""
+        """Create the infodictionary for all possible infosets, the function also returns the total amount of histories."""
+        histories = 0
         for trump in self.game.deck.ranks:
             self.game.deck.reset_deck()
             self.game.deck.deck1.remove((self.game.deck.suit[0], trump))
@@ -290,7 +293,8 @@ class MCCFR:
                     hand2 = list(card for card in dealt_cards if card not in hand1)
                     hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
                     game_state = self.game.sample_new_game(hands=hands)
-                    self.dict_helper(game_state)
+                    histories += self.dict_helper(game_state)
+        return histories + 1
 
     def save_dict(self, name):
         """Save information dictionary as pickle."""
@@ -309,7 +313,7 @@ class MCCFR:
     
     def complexity_pos(self):
         """Find the upper bound of the number of possible histories,
-        this does not yet include the possibility for player cards having matching suits."""
+        this does not however include the possibility for player cards having matching suits."""
         suits = len(self.game.deck.suit)
         ranks = len(self.game.deck.ranks)
         complexity = math.comb(suits*ranks, 2*self.game.handsize)*math.comb(2*self.game.handsize, self.game.handsize)*(suits*ranks - 2*self.game.handsize)
@@ -320,11 +324,11 @@ class MCCFR:
 
     def complexity_info(self):
         """Find the upper bound of the number of possible information sets,
-        this does not yet include the possibility for player cards having matching suits."""
+        this does not however include the possibility for player cards having matching suits."""
         suits = len(self.game.deck.suit)
         ranks = len(self.game.deck.ranks)
-        complexity = math.comb(suits*ranks, self.game.handsize)*(suits*ranks - self.game.handsize)
-        complexity *= (self.game.handsize + 1)**2
+        complexity = suits*math.comb((suits*ranks/2)-1, self.game.handsize)
+        complexity *= (self.game.handsize + 2)
         for i in range(1, self.game.handsize):
             complexity *= (suits*ranks) - (self.game.handsize+i)
             complexity *= (i+1)
