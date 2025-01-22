@@ -7,6 +7,7 @@ from MCCFR import MCCFR
 from Abstraction_functions import identity, simple, simple_hand, naive, bets, suit, suitbet, advanced
 from Play import Play
 import os
+import pickle
 
 # Just as a warning, this code is an absolute mess and I could've probably done this WAY better using string manipulation and a for loop but ah well, it is what it is now (I'm sorry :/).
 
@@ -30,6 +31,14 @@ def exploit_plotter(suits, ranks, hand_size, train_iterations, intervals, eval_i
     results = np.array(results)
     mean = np.mean(results, axis=0)
     std = np.std(results, axis=0)
+    if name != '':
+        filename = f"Dicts/{name}_results.pkl"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        a_file = open(filename, "wb")
+        pickle.dump(results, a_file)
+        pickle.dump(mean, a_file)
+        pickle.dump(std, a_file)
+        a_file.close()
     n_plot = np.linspace(0, train_iterations, intervals+1)
     plt.fill_between(n_plot, mean + std, mean - std, alpha=0.1, color='r', label='Standaard afwijking')
     plt.plot(n_plot, mean, label='Mean', color='r')
