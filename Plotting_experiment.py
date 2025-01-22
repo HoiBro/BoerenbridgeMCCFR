@@ -33,8 +33,8 @@ def main():
         "suitbet": suitbet
     }
     if abstraction == '':
-        exploit_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,
-                        FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, FLAGS.amount)
+        exploit_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.starting_iterations,
+                        FLAGS.train_iterations, FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, FLAGS.amount)
     elif abstraction == 'full':
         full_abstraction_plotter(FLAGS.suits, FLAGS.ranks, FLAGS.hand_size, FLAGS.train_iterations,
                                  FLAGS.intervals, FLAGS.eval_iterations, FLAGS.run_name, abstractions, FLAGS.amount, FLAGS.score)

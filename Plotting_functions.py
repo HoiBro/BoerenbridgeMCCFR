@@ -11,7 +11,7 @@ import pickle
 
 # Just as a warning, this code is an absolute mess and I could've probably done this WAY better using string manipulation and a for loop but ah well, it is what it is now (I'm sorry :/).
 
-def exploit_plotter(suits, ranks, hand_size, train_iterations, intervals, eval_iterations, name, runs):
+def exploit_plotter(suits, ranks, hand_size, starting_iterations, train_iterations, intervals, eval_iterations, name, runs):
     """Function to plot the MCCFR experiment."""
     results = []
     iterations_per_interval = int(train_iterations / intervals)
@@ -20,7 +20,11 @@ def exploit_plotter(suits, ranks, hand_size, train_iterations, intervals, eval_i
         deck = Deck(suits, ranks)
         game = Game(deck, hand_size)
         mccfr = MCCFR(game, identity)
-        result.append(mccfr.get_exploitability(eval_iterations))
+        if starting_iterations != 0:
+            mccfr.train_external(starting_iterations)
+            result.append(mccfr.get_exploitability(eval_iterations))
+        else:
+            result.append(mccfr.get_exploitability(eval_iterations))
 
         for _ in tqdm(range(intervals), leave=False):
             mccfr.train_external(iterations_per_interval)
@@ -39,11 +43,11 @@ def exploit_plotter(suits, ranks, hand_size, train_iterations, intervals, eval_i
         pickle.dump(mean, a_file)
         pickle.dump(std, a_file)
         a_file.close()
-    n_plot = np.linspace(0, train_iterations, intervals+1)
+    n_plot = np.linspace(starting_iterations, train_iterations+starting_iterations, intervals+1)
     plt.fill_between(n_plot, mean + std, mean - std, alpha=0.1, color='r', label='Standaard afwijking')
     plt.plot(n_plot, mean, label='Mean', color='r')
     plt.legend()
-    plt.title(f"Exploiteerbaarheid for game")
+    plt.title(f"Exploiteerbaarheid voor spel")
     plt.xlabel('Iteraties')
     plt.ylabel('Exploiteerbaarheid')
     os.makedirs(os.path.dirname(f"Plots/Boerenbridge_exploit_{suits}_{ranks}_{hand_size}_{train_iterations}_{eval_iterations}_{runs}"), exist_ok=True)
