@@ -1,7 +1,9 @@
 # Boerenbridge
-Deze GitHub pagina bevat de code voor mijn profielwerkstuk over Boerenbrige.
+Deze GitHub pagina bevat de code voor mijn profielwerkstuk over Boerenbridge.
 
-De file met het gebruikte MCCFR algoritme is MCCFR.py.
+Het bestand met het gebruikte MCCFR algoritme is MCCFR.py.
+
+Het bestand met Boerenbridge als een spel is Game.py.
 
 De afhankelijke libraries zijn numpy en tqdm.
 
