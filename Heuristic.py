@@ -158,3 +158,102 @@ class Heuristic:
         output = pickle.load(a_file)
         self.infoset_dict = output
         self.infoset_data = (self.infoset_dict, self.abstraction_function)
+
+    def play_round(self, first_player, verbose):
+        """Recursive function for playing a round by sampling from the given infodictionary. And allowing the input to play.
+        first_player: info_dicts index for starting player"""
+        game_state = self.game.sample_new_game()
+        if verbose:
+            print(f"Your opponent's hand is: {game_state[1][(first_player + 1) % 2]}")
+        print(f"Your hand is: {game_state[1][first_player]}")
+        print(f"The trump is {game_state[1][2]}")
+        print('')
+        print(f"The history is {game_state[2]}")
+        print('')
+        while not game_state[4]:
+            possible_actions = self.game.get_possible_actions(game_state)
+            if game_state[0] == first_player:
+                while True:
+                    try:
+                        if isinstance(possible_actions[0], np.int64):
+                            index = int(input(f'Give the amount you would like to bet (maximimum of {self.game.handsize}): '))
+                        else:
+                            print(f"You have the following possible actions: {possible_actions}")
+                            index = int(input('Give the index of the action you want to choose (starting from 0): '))
+                    except ValueError:
+                        print("Sorry, you didn't provide a valid index starting from 0, try again.")
+                        continue
+                    if index > len(possible_actions)-1:
+                        print("Sorry, you didn't provide a valid index starting from 0, try again.")
+                        continue
+                    else:
+                        break
+                print('')
+                action = possible_actions[index]
+                game_state = self.game.get_next_game_state(game_state, action)
+            else:
+                if len(possible_actions) == 1:
+                    if verbose:
+                        print(f"Your opponent played the following action: {possible_actions[0]} as their only action")
+                    else:
+                        print(f"Your opponent played the following action: {possible_actions[0]}")
+
+                    game_state = self.game.get_next_game_state(game_state, possible_actions[0])
+                else:
+                    info_key = self.get_info_key(game_state)
+                    infoset = self.get_infoset(info_key)
+                    strategy = infoset.get_average_strategy()
+                    action = random.choices(possible_actions, strategy)[0]
+                    if verbose:
+                        print(f"Your opponent had the following possible actions: {possible_actions} with the "
+                              f"following probabilities: {strategy}")
+                    if isinstance(action, np.int64):
+                        print(f"Your opponent bet {action}")
+                    else:
+                        print(f"Your opponent played the following action: {action}")
+                    game_state = self.game.get_next_game_state(game_state, action)
+                print('')
+
+        # Determine the payoffs
+        p_bets = game_state[2][first_player]
+        p_wins = game_state[3][first_player]
+        o_bets = game_state[2][(first_player + 1) % 2]
+        o_wins = game_state[3][(first_player + 1) % 2]
+        if p_bets == p_wins and o_bets == o_wins:
+            return [10 + 2*p_bets, 10 + 2*o_bets]
+        elif p_bets == p_wins:
+            return [10 + 2*p_bets, -2*abs(o_bets - o_wins)]
+        elif o_bets == o_wins:
+            return [-2*abs(p_bets - p_wins), 10 + 2*o_bets]
+        else:
+            return [-2*abs(p_bets - p_wins), -2*abs(o_bets - o_wins)]
+
+    def play_game(self, winning_score, verbose=False):
+        """Play a first to n game as a player against the generated strategy."""
+        score1 = 0
+        score2 = 0
+        i = 1
+        print("Initializing new game...")
+        print('')
+        while score1 < winning_score and score2 < winning_score:
+            i = (i + 1) % 2
+            payoff = self.play_round(i, verbose)
+            if payoff[0] > 0:
+                print(f"You won with a score of {payoff[0]}")
+            else:
+                print(f"You lost with a score of {-1*payoff[0]}")
+            if payoff[1] > 0:
+                print(f"Your opponent won with a score of {payoff[1]}")
+            else:
+                print(f"Your opponent lost with a score of {-1*payoff[1]}")
+            score1 += payoff[0]
+            score2 += payoff[1]
+            print('')
+            print(f"The score is You: {score1}, Opponent: {score2}")
+            print('')
+            print('')
+        final = 'won'
+        if score2 > score1:
+            final = 'lost'
+        print(f"You {final} the match by {abs(score1 - score2)} points.")
+        return score1, score2
