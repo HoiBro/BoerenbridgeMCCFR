@@ -2,6 +2,8 @@ from Infoset import Infoset
 import random
 import itertools
 import numpy as np
+import pickle
+import os
 
 class Heuristic:
     """Class which can generate a strategy, using heuristic rules."""
@@ -141,3 +143,18 @@ class Heuristic:
                     hands = [sorted(list(hand1)), sorted(hand2), (self.game.deck.suit[0], trump)]
                     game_state = self.game.sample_new_game(hands=hands)
                     self.dict_helper(game_state)
+    
+    def save_dict(self, name):
+        """Save information dictionary as pickle."""
+        filename = f"Dicts/{name}.pkl"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        a_file = open(filename, "wb")
+        pickle.dump(self.infoset_dict, a_file)
+        a_file.close()
+    
+    def load_dict(self, name):
+        """Load information dictionary as pickle."""
+        a_file = open(f"Dicts/{name}.pkl", "rb")
+        output = pickle.load(a_file)
+        self.infoset_dict = output
+        self.infoset_data = (self.infoset_dict, self.abstraction_function)

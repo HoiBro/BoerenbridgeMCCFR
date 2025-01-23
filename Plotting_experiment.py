@@ -5,22 +5,22 @@ import argparse
 """This is the program used for the Plotting experiments."""
 
 # Default parameters
-suits = 2
-ranks = 3
+suits = 4
+ranks = 4
 hand_size = 2
 starting_iterations = 0
-train_iterations = 1000
-intervals = 10
-eval_iterations = 100
-run_name = 'suitbet1'
-abstraction = "suitbet"
-amount = 1
+train_iterations = 100000
+intervals = 100
+eval_iterations = 10000
+run_name = 'FinalTest'
+abstraction = "full"
+amount = 5
 score = False
 FLAGS = None
 
 # These are the abstractions for the "full" abstraction.
 # The abstractions to choose from are naive, simple, simple_hand, bets, suit, suitbet, advanced in that order.
-abstractions = [False, False, False, False, False, False, False]
+abstractions = [False, False, False, True, True, True, True]
 
 def main():
     abstraction_functions = {

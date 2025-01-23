@@ -7,12 +7,12 @@ import argparse
 
 # Default parameters
 suits = 4
-ranks = 13
+ranks = 4
 hand_size = 2
 starting_iterations = 0
 train_iterations = 100000
-intervals = 400
-eval_iterations = 2500
+intervals = 100
+eval_iterations = 10000
 run_name = 'SuitbetTest'
 abstraction = "suitbet"
 FLAGS = None
@@ -23,13 +23,13 @@ speed = True
 
 # These are the abstractions for the "full" abstraction.
 # The abstractions to choose from are naive, simple, simple_hand, bets, suit, suitbet, advanced in that order.
-abstractions = [False, False, False, False, False, False, False]
+abstractions = [False, False, False, True, True, True, True]
 
 def main():
     abstraction_functions = {
-        "identity": identity,
         "adv": advanced,
         "bets": bets,
+        "identity": identity,
         "naive": naive,
         "sim": simple,
         "sim_hand": simple_hand,
